@@ -1,0 +1,79 @@
+<mxfile host="app.diagrams.net" modified="2026-04-12T00:00:00.000Z" agent="claude" version="24.0.0">
+  <diagram name="ControlRemot" id="controlremot">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="826" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="http" value="HttpServer&#10;(thread Mongoose)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="60" y="40" width="200" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ws" value="Client Web&#10;(WebSocket /ws)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="900" y="40" width="200" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="cr" value="ControlRemot (QP::QActive)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=16;fontStyle=1;verticalAlign=top;spacingTop=12" vertex="1" parent="1">
+          <mxGeometry x="60" y="140" width="1040" height="560" as="geometry" />
+        </mxCell>
+
+        <mxCell id="inlbl" value="Entrades (events)" style="text;html=1;align=center;fontSize=12;fontStyle=4;fontColor=#2a5d84" vertex="1" parent="1">
+          <mxGeometry x="100" y="180" width="260" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="outlbl" value="Sortides" style="text;html=1;align=center;fontSize=12;fontStyle=4;fontColor=#8a5a00" vertex="1" parent="1">
+          <mxGeometry x="800" y="180" width="260" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="in_io" value="IoStateHttpEvt&#10;(IO_STATE_HTTP_SIG)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11" vertex="1" parent="1">
+          <mxGeometry x="100" y="210" width="260" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="in_cmd" value="OutputCmdEvt&#10;(CTRL_OUTPUT_CMD_SIG)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11" vertex="1" parent="1">
+          <mxGeometry x="100" y="280" width="260" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="in_mode" value="OutputModeEvt&#10;(CTRL_OUTPUT_MODE_SIG)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11" vertex="1" parent="1">
+          <mxGeometry x="100" y="350" width="260" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="in_ret" value="OutputReturnAutoEvt&#10;(CTRL_OUTPUT_RETURN_AUTO_SIG)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11" vertex="1" parent="1">
+          <mxGeometry x="100" y="420" width="260" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="in_del" value="OutputDeleteEvt&#10;(CTRL_OUTPUT_DELETE_SIG)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11" vertex="1" parent="1">
+          <mxGeometry x="100" y="490" width="260" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="out_pub" value="OutputResultEvt&#10;(OUTPUT_RESULT_SIG, PUBLISH)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11" vertex="1" parent="1">
+          <mxGeometry x="800" y="280" width="260" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="out_ss" value="SharedState&#10;se.outputsFull + se.push_pending" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11" vertex="1" parent="1">
+          <mxGeometry x="800" y="420" width="260" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e1" style="endArrow=classic;html=1;dashed=1" edge="1" parent="1" source="http" target="in_io">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" style="endArrow=classic;html=1;dashed=1" edge="1" parent="1" source="http" target="in_cmd">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" style="endArrow=classic;html=1;dashed=1" edge="1" parent="1" source="http" target="in_mode">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" style="endArrow=classic;html=1;dashed=1" edge="1" parent="1" source="http" target="in_ret">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" style="endArrow=classic;html=1;dashed=1" edge="1" parent="1" source="http" target="in_del">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e9" style="endArrow=classic;html=1;dashed=1" edge="1" parent="1" source="out_ss" target="ws">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

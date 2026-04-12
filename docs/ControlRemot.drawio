@@ -1,0 +1,61 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.6.6 Chrome/144.0.7559.236 Electron/40.8.4 Safari/537.36" version="29.6.6">
+  <diagram name="ControlRemot" id="controlremot">
+    <mxGraphModel dx="2275" dy="669" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="826" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="MuyWvQkJ3MJwVjls3JEL-2" edge="1" parent="1" source="http" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="in_cmd">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MuyWvQkJ3MJwVjls3JEL-3" edge="1" parent="1" source="http" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" target="in_mode">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MuyWvQkJ3MJwVjls3JEL-4" edge="1" parent="1" source="http" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="in_ret">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MuyWvQkJ3MJwVjls3JEL-5" edge="1" parent="1" source="http" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="in_del">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="http" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;fontStyle=1" value="HttpServer&#xa;(thread Mongoose)" vertex="1">
+          <mxGeometry height="50" width="200" x="-97" y="310" as="geometry" />
+        </mxCell>
+        <mxCell id="ws" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;fontStyle=1" value="Client Web&#xa;(WebSocket /ws)" vertex="1">
+          <mxGeometry height="50" width="200" x="934" y="310" as="geometry" />
+        </mxCell>
+        <mxCell id="cr" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=16;fontStyle=1;verticalAlign=top;spacingTop=12" value="ControlRemot (QP::QActive)" vertex="1">
+          <mxGeometry height="400" width="640" x="240" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="in_io" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11" value="IoStateHttpEvt&#xa;(IO_STATE_HTTP_SIG)" vertex="1">
+          <mxGeometry height="50" width="260" x="240" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="in_cmd" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11" value="OutputCmdEvt&#xa;(CTRL_OUTPUT_CMD_SIG)" vertex="1">
+          <mxGeometry height="50" width="260" x="240" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="in_mode" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11" value="OutputModeEvt&#xa;(CTRL_OUTPUT_MODE_SIG)" vertex="1">
+          <mxGeometry height="50" width="260" x="240" y="310" as="geometry" />
+        </mxCell>
+        <mxCell id="in_ret" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11" value="OutputReturnAutoEvt&#xa;(CTRL_OUTPUT_RETURN_AUTO_SIG)" vertex="1">
+          <mxGeometry height="50" width="260" x="240" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="in_del" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11" value="OutputDeleteEvt&#xa;(CTRL_OUTPUT_DELETE_SIG)" vertex="1">
+          <mxGeometry height="50" width="260" x="240" y="410" as="geometry" />
+        </mxCell>
+        <mxCell id="out_pub" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11" value="OutputResultEvt&#xa;(OUTPUT_RESULT_SIG, PUBLISH)" vertex="1">
+          <mxGeometry height="50" width="260" x="620" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="MuyWvQkJ3MJwVjls3JEL-6" edge="1" parent="1" source="out_ss" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="ws">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="out_ss" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11" value="SharedState&#xa;se.outputsFull + se.push_pending" vertex="1">
+          <mxGeometry height="50" width="260" x="620" y="310" as="geometry" />
+        </mxCell>
+        <mxCell id="MuyWvQkJ3MJwVjls3JEL-8" edge="1" parent="1" source="MuyWvQkJ3MJwVjls3JEL-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" target="in_io">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MuyWvQkJ3MJwVjls3JEL-7" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;fontStyle=1" value="ControlHorari" vertex="1">
+          <mxGeometry height="50" width="200" x="-97" y="210" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

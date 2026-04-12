@@ -1,0 +1,84 @@
+#include "qp_config.hpp"
+#include "qpcpp/include/qpcpp.hpp"
+#include "signals.h"
+#include "SharedState.h"
+#include "ControlRemot/ControlRemot.h"
+#include "HttpServer/HttpServer.h"
+#include <cstdio>
+#include <cstdlib>
+
+// ── Instàncies globals ────────────────────────────────────────────────────────
+
+SharedState se; // definició de l'extern declarat a SharedState.h
+
+static ControlRemot   s_controlRemot;
+
+// ── Cues d'events ─────────────────────────────────────────────────────────────
+
+static QP::QEvtPtr s_controlRemotQSto[16];
+
+// ── Pool d'events dinàmics ────────────────────────────────────────────────────
+// Un sol pool dimensionat per al tipus més gran (IoStateHttpEvt).
+
+static QF_MPOOL_EL(IoStateHttpEvt) s_poolSto[8];
+
+// ── Llista de subscripcions publish-subscribe ─────────────────────────────────
+
+static QP::QSubscrList s_subscrSto[MAX_SIG];
+
+// ── main ──────────────────────────────────────────────────────────────────────
+
+int main() {
+    std::printf("ControlSortides arrencant...\n");
+
+    QP::QF::init();
+
+    // Taula publish-subscribe
+    QP::QActive::psInit(s_subscrSto, Q_DIM(s_subscrSto));
+
+    // Pool per als events dinàmics (OutputCmdEvt, OutputModeEvt, IoStateHttpEvt…)
+    QP::QF::poolInit(s_poolSto, sizeof(s_poolSto), sizeof(s_poolSto[0]));
+
+    s_controlRemot.start(1U,
+        s_controlRemotQSto, Q_DIM(s_controlRemotQSto),
+        nullptr, 0U);
+
+    // Servidor HTTP en el seu thread (Mongoose)
+    HttpServer::start(8080U, &s_controlRemot);
+    std::printf("HTTP escoltant al port 8080\n");
+
+    // Cedeix el control al kernel QV; torna quan es crida QF::stop()
+    return QP::QF::run();
+}
+
+// ── Callbacks obligatoris del port QF ─────────────────────────────────────────
+
+namespace QP {
+
+// Cridat per QF::run() just abans d'entrar al bucle d'events.
+void QF::onStartup() {
+    // 100 ticks/s → 1 tick = 10 ms. Prioritat del thread ticker = 30.
+    QF::setTickRate(100U, 30);
+}
+
+// Cridat en sortir del bucle d'events (Ctrl-C o QF::stop()).
+void QF::onCleanup() {
+    HttpServer::stop();
+    std::printf("ControlSortides aturat.\n");
+}
+
+// Cridat pel thread ticker a cada tick del sistema.
+// Ha de cridar QTimeEvt::TICK_X per a cada tick rate usat.
+void QF::onClockTick() {
+    QP::QTimeEvt::TICK_X(0U, nullptr);
+}
+
+} // namespace QP
+
+// ── Callback d'error QP (Q_onError) ──────────────────────────────────────────
+// Cridat per les assertions internes de QP quan detecten un estat invàlid.
+
+Q_NORETURN Q_onError(char const * const module, int_t const id) {
+    std::fprintf(stderr, "Q_onError: %s:%d\n", module, id);
+    std::abort();
+}

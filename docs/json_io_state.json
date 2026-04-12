@@ -1,0 +1,7 @@
+{
+  "outputs": [
+    { "id": 10, "state": true  },
+    { "id": 11, "state": false },
+    { "id": 12, "state": true  }
+  ]
+}

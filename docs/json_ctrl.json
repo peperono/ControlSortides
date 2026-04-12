@@ -1,0 +1,6 @@
+[
+  { "id": 10, "action": "set_remote"  },
+  { "id": 11, "action": "set_auto"    },
+  { "id": 10, "action": "activate"    },
+  { "id": 11, "action": "deactivate"  }
+]

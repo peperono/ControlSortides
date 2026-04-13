@@ -1,9 +1,10 @@
 #include "ControlHorari.h"
+#include "ControlHorariState.h"
 #include "../mongoose/mongoose.h"
-#include "../SharedState.h"
 #include <cstdio>
-#include <ctime>
 #include <mutex>
+
+ControlHorariState ch_state;
 
 // ── Claus dels dies al JSON (0=dilluns..6=diumenge) ──────────────────────────
 
@@ -15,25 +16,14 @@ static const char* DAY_KEYS[7] = {
 // ── Constructor ───────────────────────────────────────────────────────────────
 
 ControlHorari::ControlHorari() noexcept
-    : QP::QActive{Q_STATE_CAST(&ControlHorari::initial)},
-      m_tick{this, HORARI_TICK_SIG, 0U}
+    : QP::QActive{Q_STATE_CAST(&ControlHorari::initial)}
 {}
 
 // ── State: initial ────────────────────────────────────────────────────────────
 
 Q_STATE_DEF(ControlHorari, initial) {
     Q_UNUSED_PAR(e);
-
-    // Inicialitza el rellotge simulat des de l'hora real del sistema
-    std::time_t now = std::time(nullptr);
-    std::tm lt;
-    localtime_r(&now, &lt);
-    m_wday   = (lt.tm_wday + 6) % 7;
-    m_hour   = lt.tm_hour;
-    m_minute = lt.tm_min;
-
-    // 5 ticks = 50 ms @ 100 Hz → cada tick avança 1 minut simulat (1 dia ≈ 72 s)
-    m_tick.armX(5U, 5U);
+    subscribe(RELLOTGE_TICK_SIG);
     return tran(&ControlHorari::operating);
 }
 
@@ -49,37 +39,21 @@ Q_STATE_DEF(ControlHorari, operating) {
             break;
         }
 
-        case HORARI_TICK_SIG: {
+        case RELLOTGE_TICK_SIG: {
+            auto const* tick = Q_EVT_CAST(RellotgeTickEvt);
+            int hh   = tick->hour;
+            int mm   = tick->minute;
+            int wday = tick->wday;
+
             // Recarrega el calendari si HttpServer n'ha rebut un de nou
-            if (se.horariLoadPending.exchange(false)) {
+            if (ch_state.horariLoadPending.exchange(false)) {
                 std::string copy;
                 {
-                    std::lock_guard<std::mutex> lk(se.mtx);
-                    copy = se.horariJson;
+                    std::lock_guard<std::mutex> lk(ch_state.mtx);
+                    copy = ch_state.horariJson;
                 }
                 loadJson(copy.c_str(), copy.size());
             }
-
-            // Avança el rellotge simulat un minut
-            if (++m_minute >= 60) {
-                m_minute = 0;
-                if (++m_hour >= 24) {
-                    m_hour = 0;
-                    m_wday = (m_wday + 1) % 7;
-                }
-            }
-            int hh = m_hour;
-            int mm = m_minute;
-            int wday = m_wday;
-
-            // Publica el rellotge simulat a SharedState per al WebSocket
-            {
-                std::lock_guard<std::mutex> lk(se.mtx);
-                se.horariHour   = hh;
-                se.horariMinute = mm;
-                se.horariWday   = wday;
-            }
-            se.push_pending.store(true);
 
             // Primer compta quantes maniobres coincideixen aquest minut
             int matches = 0;
@@ -87,11 +61,11 @@ Q_STATE_DEF(ControlHorari, operating) {
                 if (m.hour == hh && m.minute == mm) ++matches;
             }
             if (matches > 0) {
-                auto* ev = Q_NEW(IoStateHttpEvt, IO_STATE_HTTP_SIG);
+                auto* ev = Q_NEW(IoStateEvt, IO_STATE_SIG);
                 ev->n_outputs = 0;
                 for (auto const& m : m_schedule[wday]) {
                     if (m.hour == hh && m.minute == mm
-                        && ev->n_outputs < IoStateHttpEvt::MAX_OUTPUTS) {
+                        && ev->n_outputs < IoStateEvt::MAX_OUTPUTS) {
                         ev->outputs[ev->n_outputs++] = { m.id, m.on };
                         std::printf("[ControlHorari] %02d:%02d output %d -> %s\n",
                                     hh, mm, m.id, m.on ? "ON" : "OFF");

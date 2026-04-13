@@ -27,12 +27,15 @@ h1{text-align:center;margin-bottom:24px;color:#00d4ff}
 .output-mode{font-size:12px;color:#aaa;margin-bottom:12px}
 
 .controls{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
-.btn{border:none;border-radius:4px;padding:5px 9px;cursor:pointer;font-size:11px;font-weight:600;transition:all .2s}
+.btn{border:none;border-radius:4px;padding:5px 9px;cursor:pointer;font-size:11px;font-weight:600;transition:all .2s;background:#00d4ff;color:#000}
 .btn:hover{transform:scale(1.05)}
-.btn-on{background:#4caf50;color:#fff}
-.btn-off{background:#f44;color:#fff}
-.btn-remote{background:#ff9800;color:#fff}
-.btn-auto{background:#2196f3;color:#fff}
+.btn.flash{animation:btn-press .18s ease-out}
+@keyframes btn-press{
+  0%{transform:translateY(0);box-shadow:0 3px 0 #0077aa}
+  40%{transform:translateY(3px);box-shadow:0 0 0 #0077aa,inset 0 2px 4px rgba(0,0,0,.4)}
+  100%{transform:translateY(0);box-shadow:0 3px 0 #0077aa}
+}
+.btn{box-shadow:0 3px 0 #0077aa}
 
 .section{background:#16213e;border-radius:12px;padding:20px;margin-bottom:20px;max-width:600px;margin-left:auto;margin-right:auto}
 .section h2{font-size:16px;margin-bottom:12px;color:#00d4ff}
@@ -40,7 +43,7 @@ h1{text-align:center;margin-bottom:24px;color:#00d4ff}
 .io-form label{font-size:14px;min-width:60px}
 .io-form input{background:#0f3460;border:1px solid #444;color:#e0e0e0;border-radius:4px;padding:6px 10px;width:70px;font-size:14px}
 .io-form select{background:#0f3460;border:1px solid #444;color:#e0e0e0;border-radius:4px;padding:6px 10px;font-size:14px}
-.btn-send{background:#00d4ff;color:#000;padding:10px 24px;font-size:14px;display:block;margin:12px auto 0}
+.btn-send{padding:10px 24px;font-size:14px;display:block;margin:12px auto 0}
 
 .log{background:#0a0a1a;border-radius:8px;padding:12px;max-height:200px;overflow-y:auto;font-family:monospace;font-size:13px;line-height:1.6}
 .log-entry{border-bottom:1px solid #1a1a2e;padding:2px 0}
@@ -76,6 +79,13 @@ h1{text-align:center;margin-bottom:24px;color:#00d4ff}
 </div>
 
 <script>
+document.addEventListener('click', e => {
+  const b = e.target.closest('.btn');
+  if (!b) return;
+  b.classList.remove('flash');
+  void b.offsetWidth;
+  b.classList.add('flash');
+});
 const outputsEl = document.getElementById('outputs');
 const logEl = document.getElementById('log');
 const wsStatus = document.getElementById('ws-status');

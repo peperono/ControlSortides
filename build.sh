@@ -62,6 +62,7 @@ $CXX -std=gnu++17 -Wall -O1 $STATIC_FLAG \
     "$ROOT/main.cpp" \
     "$ROOT/ControlRemot/ControlRemot.cpp" \
     "$ROOT/ControlHorari/ControlHorari.cpp" \
+    "$ROOT/Rellotge/Rellotge.cpp" \
     "$ROOT/HttpServer/HttpServer.cpp" \
     "$QPCPP/src/qf/qep_hsm.cpp" \
     "$QPCPP/src/qf/qep_msm.cpp" \

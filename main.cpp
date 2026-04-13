@@ -1,30 +1,31 @@
 #include "qp_config.hpp"
 #include "qpcpp/include/qpcpp.hpp"
 #include "signals.h"
-#include "SharedState.h"
 #include "ControlRemot/ControlRemot.h"
 #include "ControlHorari/ControlHorari.h"
+#include "ControlHorari/ControlHorariState.h"
 #include "ControlHorari/json_horari.h"
+#include "Rellotge/Rellotge.h"
 #include "HttpServer/HttpServer.h"
 #include <cstdio>
 #include <cstdlib>
 
 // ── Instàncies globals ────────────────────────────────────────────────────────
 
-SharedState se; // definició de l'extern declarat a SharedState.h
-
 static ControlRemot   s_controlRemot;
 static ControlHorari  s_controlHorari;
+static Rellotge       s_rellotge;
 
 // ── Cues d'events ─────────────────────────────────────────────────────────────
 
 static QP::QEvtPtr s_controlRemotQSto[64];
-static QP::QEvtPtr s_controlHorariQSto[16];
+static QP::QEvtPtr s_controlHorariQSto[32];
+static QP::QEvtPtr s_rellotgeQSto[16];
 
 // ── Pool d'events dinàmics ────────────────────────────────────────────────────
-// Un sol pool dimensionat per al tipus més gran (IoStateHttpEvt).
+// Un sol pool dimensionat per al tipus més gran (IoStateEvt).
 
-static QF_MPOOL_EL(IoStateHttpEvt) s_poolSto[8];
+static QF_MPOOL_EL(IoStateEvt) s_poolSto[8];
 
 // ── Llista de subscripcions publish-subscribe ─────────────────────────────────
 
@@ -40,17 +41,21 @@ int main() {
     // Taula publish-subscribe
     QP::QActive::psInit(s_subscrSto, Q_DIM(s_subscrSto));
 
-    // Pool per als events dinàmics (OutputCmdEvt, OutputModeEvt, IoStateHttpEvt…)
+    // Pool per als events dinàmics (OutputCmdEvt, OutputModeEvt, IoStateEvt…)
     QP::QF::poolInit(s_poolSto, sizeof(s_poolSto), sizeof(s_poolSto[0]));
 
     s_controlRemot.start(2U,
         s_controlRemotQSto, Q_DIM(s_controlRemotQSto),
         nullptr, 0U);
 
-    se.horariJson.assign(JSON_HORARI, sizeof(JSON_HORARI) - 1);
+    ch_state.horariJson.assign(JSON_HORARI, sizeof(JSON_HORARI) - 1);
     s_controlHorari.loadJson(JSON_HORARI, sizeof(JSON_HORARI) - 1);
     s_controlHorari.start(1U,
         s_controlHorariQSto, Q_DIM(s_controlHorariQSto),
+        nullptr, 0U);
+
+    s_rellotge.start(3U,
+        s_rellotgeQSto, Q_DIM(s_rellotgeQSto),
         nullptr, 0U);
 
     // Servidor HTTP en el seu thread (Mongoose)

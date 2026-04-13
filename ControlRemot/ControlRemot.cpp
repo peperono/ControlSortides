@@ -1,8 +1,10 @@
 #include "ControlRemot.h"
-#include "../SharedState.h"
+#include "ControlRemotState.h"
 #include "../mongoose/mongoose.h"
 #include <cstdio>
 #include <mutex>
+
+ControlRemotState cr_state;
 
 // ── Constructor ───────────────────────────────────────────────────────────────
 
@@ -15,7 +17,7 @@ ControlRemot::ControlRemot() noexcept
 
 Q_STATE_DEF(ControlRemot, initial) {
     Q_UNUSED_PAR(e);
-    subscribe(IO_STATE_HTTP_SIG); // ControlHorari publica estat físic
+    subscribe(IO_STATE_SIG); // ControlHorari publica estat físic
     return tran(&ControlRemot::operating);
 }
 
@@ -32,8 +34,8 @@ Q_STATE_DEF(ControlRemot, operating) {
         }
 
         // Entrada: estat físic injectat via HTTP (POST /io_state)
-        case IO_STATE_HTTP_SIG: {
-            auto const* ev = Q_EVT_CAST(IoStateHttpEvt);
+        case IO_STATE_SIG: {
+            auto const* ev = Q_EVT_CAST(IoStateEvt);
             for (int i = 0; i < ev->n_outputs; ++i) {
                 auto& out    = m_outputs[ev->outputs[i].id];
                 out.physical = ev->outputs[i].state;
@@ -48,7 +50,7 @@ Q_STATE_DEF(ControlRemot, operating) {
 
         // Comanda activar/desactivar
         // Ambdós modes: aplica de seguida. En AUTO el mode no canvia; el pròxim
-        // IO_STATE_CHANGED_SIG tornarà a reflectir l'estat físic.
+        // IO_STATE_SIG tornarà a reflectir l'estat físic.
         case CTRL_OUTPUT_CMD_SIG: {
             auto const* ev = Q_EVT_CAST(OutputCmdEvt);
             auto& out      = m_outputs[ev->output_id];
@@ -119,15 +121,14 @@ void ControlRemot::publishResult() {
     }
 
     {
-        std::lock_guard<std::mutex> lk(se.mtx);
-        se.outputs = m_resultEvt.outputs;
-        se.outputsFull.clear();
+        std::lock_guard<std::mutex> lk(cr_state.mtx);
+        cr_state.outputsFull.clear();
         for (auto const& [id, out] : m_outputs) {
-            se.outputsFull[id] = {out.physical, out.commanded, out.result,
-                                  out.mode == OutputEntry::Mode::REMOTE};
+            cr_state.outputsFull[id] = {out.physical, out.commanded, out.result,
+                                        out.mode == OutputEntry::Mode::REMOTE};
         }
     }
-    se.push_pending.store(true);
+    cr_state.push_pending.store(true);
 
     PUBLISH(&m_resultEvt, this);
 }

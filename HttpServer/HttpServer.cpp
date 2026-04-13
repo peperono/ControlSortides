@@ -1,6 +1,8 @@
 #include "HttpServer.h"
 #include "../ControlRemot/ControlRemot.h"
-#include "../SharedState.h"
+#include "../ControlRemot/ControlRemotState.h"
+#include "../ControlHorari/ControlHorariState.h"
+#include "../Rellotge/RellotgeState.h"
 #include "../signals.h"
 #include "../mongoose/mongoose.h"
 #include <atomic>
@@ -50,17 +52,21 @@ static std::string outputs_to_json(
 // ── WebSocket push ────────────────────────────────────────────────────────────
 
 static void push_if_pending(struct mg_mgr* mgr) {
-    if (!se.push_pending.load()) return;
-    se.push_pending.store(false);
+    bool pending = cr_state.push_pending.exchange(false) |
+                   rellotge_state.push_pending.exchange(false);
+    if (!pending) return;
 
     std::unordered_map<int, OutputInfo> outputs;
     int hh, mm, wd;
     {
-        std::lock_guard<std::mutex> lk(se.mtx);
-        outputs = se.outputsFull;
-        hh = se.horariHour;
-        mm = se.horariMinute;
-        wd = se.horariWday;
+        std::lock_guard<std::mutex> lk(cr_state.mtx);
+        outputs = cr_state.outputsFull;
+    }
+    {
+        std::lock_guard<std::mutex> lk(rellotge_state.mtx);
+        hh = rellotge_state.hour;
+        mm = rellotge_state.minute;
+        wd = rellotge_state.wday;
     }
 
     std::string msg = outputs_to_json(outputs, hh, mm, wd);
@@ -105,11 +111,11 @@ static void http_fn(struct mg_connection* c, int ev, void* ev_data) {
                 return;
             }
 
-            auto* ev = Q_NEW(IoStateHttpEvt, IO_STATE_HTTP_SIG);
+            auto* ev = Q_NEW(IoStateEvt, IO_STATE_SIG);
             ev->n_outputs = 0;
 
             struct mg_str json = hm->body;
-            for (int i = 0; i < IoStateHttpEvt::MAX_OUTPUTS; ++i) {
+            for (int i = 0; i < IoStateEvt::MAX_OUTPUTS; ++i) {
                 char path[32];
                 std::snprintf(path, sizeof(path), "$.outputs[%d]", i);
                 int elen = 0;
@@ -135,8 +141,8 @@ static void http_fn(struct mg_connection* c, int ev, void* ev_data) {
         {
             std::string body;
             {
-                std::lock_guard<std::mutex> lk(se.mtx);
-                body = se.horariJson;
+                std::lock_guard<std::mutex> lk(ch_state.mtx);
+                body = ch_state.horariJson;
             }
             mg_http_reply(c, 200, "Content-Type: application/json\r\n",
                           "%.*s", (int)body.size(), body.c_str());
@@ -148,10 +154,10 @@ static void http_fn(struct mg_connection* c, int ev, void* ev_data) {
         {
             if (hm->body.len > 0) {
                 {
-                    std::lock_guard<std::mutex> lk(se.mtx);
-                    se.horariJson.assign(hm->body.buf, hm->body.len);
+                    std::lock_guard<std::mutex> lk(ch_state.mtx);
+                    ch_state.horariJson.assign(hm->body.buf, hm->body.len);
                 }
-                se.horariLoadPending.store(true);
+                ch_state.horariLoadPending.store(true);
             }
             mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{}");
         }
@@ -188,11 +194,14 @@ static void http_fn(struct mg_connection* c, int ev, void* ev_data) {
         std::unordered_map<int, OutputInfo> outputs;
         int hh, mm, wd;
         {
-            std::lock_guard<std::mutex> lk(se.mtx);
-            outputs = se.outputsFull;
-            hh = se.horariHour;
-            mm = se.horariMinute;
-            wd = se.horariWday;
+            std::lock_guard<std::mutex> lk(cr_state.mtx);
+            outputs = cr_state.outputsFull;
+        }
+        {
+            std::lock_guard<std::mutex> lk(rellotge_state.mtx);
+            hh = rellotge_state.hour;
+            mm = rellotge_state.minute;
+            wd = rellotge_state.wday;
         }
         std::string msg = outputs_to_json(outputs, hh, mm, wd);
         mg_ws_send(c, msg.c_str(), msg.size(), WEBSOCKET_OP_TEXT);

@@ -15,6 +15,7 @@ ControlRemot::ControlRemot() noexcept
 
 Q_STATE_DEF(ControlRemot, initial) {
     Q_UNUSED_PAR(e);
+    subscribe(IO_STATE_HTTP_SIG); // ControlHorari publica estat físic
     return tran(&ControlRemot::operating);
 }
 

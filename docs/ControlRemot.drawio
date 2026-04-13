@@ -1,59 +1,123 @@
 <mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.6.6 Chrome/144.0.7559.236 Electron/40.8.4 Safari/537.36" version="29.6.6">
   <diagram name="ControlRemot" id="controlremot">
-    <mxGraphModel dx="2275" dy="669" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="826" math="0" shadow="0">
+    <mxGraphModel dx="2398" dy="1569" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="826" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="MuyWvQkJ3MJwVjls3JEL-2" edge="1" parent="1" source="http" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="in_cmd">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="MuyWvQkJ3MJwVjls3JEL-3" edge="1" parent="1" source="http" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" target="in_mode">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="MuyWvQkJ3MJwVjls3JEL-4" edge="1" parent="1" source="http" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="in_ret">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="MuyWvQkJ3MJwVjls3JEL-5" edge="1" parent="1" source="http" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="in_del">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
         <mxCell id="http" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;fontStyle=1" value="HttpServer&#xa;(thread Mongoose)" vertex="1">
-          <mxGeometry height="50" width="200" x="-97" y="310" as="geometry" />
+          <mxGeometry height="60" width="200" x="-719" y="420" as="geometry" />
         </mxCell>
         <mxCell id="ws" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;fontStyle=1" value="Client Web&#xa;(WebSocket /ws)" vertex="1">
-          <mxGeometry height="50" width="200" x="934" y="310" as="geometry" />
+          <mxGeometry height="60" width="200" x="911" y="120" as="geometry" />
         </mxCell>
-        <mxCell id="cr" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=16;fontStyle=1;verticalAlign=top;spacingTop=12" value="ControlRemot (QP::QActive)" vertex="1">
-          <mxGeometry height="400" width="640" x="240" y="130" as="geometry" />
+        <mxCell id="ch" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=16;fontStyle=1;verticalAlign=top;spacingTop=8" value="ProgramacioHoraria (QP::QActive)" vertex="1">
+          <mxGeometry height="140" width="598" x="-466" y="-140" as="geometry" />
+        </mxCell>
+        <mxCell id="ch_tick" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11" value="HORARI_TICK_SIG&#xa;(QTimeEvt, cada 50 ms)" vertex="1">
+          <mxGeometry height="50" width="260" x="-466" y="-100" as="geometry" />
+        </mxCell>
+        <mxCell id="ch_reload" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11" value="SharedState.horariJson&#xa;+ horariLoadPending" vertex="1">
+          <mxGeometry height="50" width="260" x="-466" y="-50" as="geometry" />
+        </mxCell>
+        <mxCell id="ch_out_io" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11" value="IoStateHttpEvt&#xa;(IO_STATE_HTTP_SIG, PUBLISH)" vertex="1">
+          <mxGeometry height="50" width="260" x="-128" y="-50" as="geometry" />
+        </mxCell>
+        <mxCell id="ch_out_time" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11" value="SharedState&#xa;horariHour/Minute/Wday + push_pending" vertex="1">
+          <mxGeometry height="50" width="260" x="-128" y="-100" as="geometry" />
+        </mxCell>
+        <mxCell id="cr" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=16;fontStyle=1;verticalAlign=top;spacingTop=8" value="ControlRemot (QP::QActive)" vertex="1">
+          <mxGeometry height="320" width="600" x="240" y="180" as="geometry" />
         </mxCell>
         <mxCell id="in_io" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11" value="IoStateHttpEvt&#xa;(IO_STATE_HTTP_SIG)" vertex="1">
-          <mxGeometry height="50" width="260" x="240" y="210" as="geometry" />
+          <mxGeometry height="50" width="260" x="240" y="220" as="geometry" />
         </mxCell>
         <mxCell id="in_cmd" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11" value="OutputCmdEvt&#xa;(CTRL_OUTPUT_CMD_SIG)" vertex="1">
-          <mxGeometry height="50" width="260" x="240" y="260" as="geometry" />
+          <mxGeometry height="50" width="260" x="240" y="275" as="geometry" />
         </mxCell>
         <mxCell id="in_mode" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11" value="OutputModeEvt&#xa;(CTRL_OUTPUT_MODE_SIG)" vertex="1">
-          <mxGeometry height="50" width="260" x="240" y="310" as="geometry" />
+          <mxGeometry height="50" width="260" x="240" y="330" as="geometry" />
         </mxCell>
         <mxCell id="in_ret" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11" value="OutputReturnAutoEvt&#xa;(CTRL_OUTPUT_RETURN_AUTO_SIG)" vertex="1">
-          <mxGeometry height="50" width="260" x="240" y="360" as="geometry" />
+          <mxGeometry height="50" width="260" x="240" y="385" as="geometry" />
         </mxCell>
         <mxCell id="in_del" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11" value="OutputDeleteEvt&#xa;(CTRL_OUTPUT_DELETE_SIG)" vertex="1">
-          <mxGeometry height="50" width="260" x="240" y="410" as="geometry" />
+          <mxGeometry height="50" width="260" x="240" y="440" as="geometry" />
         </mxCell>
         <mxCell id="out_pub" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11" value="OutputResultEvt&#xa;(OUTPUT_RESULT_SIG, PUBLISH)" vertex="1">
-          <mxGeometry height="50" width="260" x="620" y="260" as="geometry" />
+          <mxGeometry height="50" width="260" x="580" y="275" as="geometry" />
         </mxCell>
-        <mxCell id="MuyWvQkJ3MJwVjls3JEL-6" edge="1" parent="1" source="out_ss" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="ws">
+        <mxCell id="out_ss" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11" value="SharedState&#xa;outputsFull + push_pending" vertex="1">
+          <mxGeometry height="50" width="260" x="580" y="325" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" edge="1" parent="1" source="http" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5" target="in_cmd">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="-310" y="450" />
+              <mxPoint x="-310" y="380" />
+              <mxPoint x="-139" y="380" />
+              <mxPoint x="-139" y="300" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e2" edge="1" parent="1" source="http" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5" target="in_mode">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="-310" y="450" />
+              <mxPoint x="-310" y="380" />
+              <mxPoint x="-139" y="380" />
+              <mxPoint x="-139" y="355" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e3" edge="1" parent="1" source="http" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5" target="in_ret">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="-310" y="450" />
+              <mxPoint x="-310" y="380" />
+              <mxPoint x="-139" y="380" />
+              <mxPoint x="-139" y="410" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e4" edge="1" parent="1" source="http" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5" target="in_del">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="-310" y="450" />
+              <mxPoint x="-310" y="380" />
+              <mxPoint x="-139" y="380" />
+              <mxPoint x="-139" y="465" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e5" edge="1" parent="1" source="out_ss" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5" target="ws">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="880" y="350" />
+              <mxPoint x="880" y="150" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e6" edge="1" parent="1" source="http" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.2;entryX=0;entryY=0.5" target="ch_reload" value="POST /horari">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="out_ss" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11" value="SharedState&#xa;se.outputsFull + se.push_pending" vertex="1">
-          <mxGeometry height="50" width="260" x="620" y="310" as="geometry" />
-        </mxCell>
-        <mxCell id="MuyWvQkJ3MJwVjls3JEL-8" edge="1" parent="1" source="MuyWvQkJ3MJwVjls3JEL-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" target="in_io">
+        <mxCell id="e9" edge="1" parent="1" source="ch_reload" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0;exitY=0.8;entryX=1;entryY=0.3;dashed=1" target="http" value="GET /horari">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="MuyWvQkJ3MJwVjls3JEL-7" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;fontStyle=1" value="ControlHorari" vertex="1">
-          <mxGeometry height="50" width="200" x="-97" y="210" as="geometry" />
+        <mxCell id="e7" edge="1" parent="1" source="ch_out_io" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="in_io" value="PUBLISH">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="150" y="-25" />
+              <mxPoint x="150" y="245" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e8" edge="1" parent="1" source="ch_out_time" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.2" target="ws" value="WS push">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="880" y="-75" />
+              <mxPoint x="880" y="132" />
+            </Array>
+          </mxGeometry>
         </mxCell>
       </root>
     </mxGraphModel>

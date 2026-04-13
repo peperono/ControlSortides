@@ -35,6 +35,12 @@ printf 'static const char INDEX_HTML[] = R"RAWHTML(\n' > "$ROOT/HttpServer/index
 cat "$ROOT/HttpServer/index.html" >> "$ROOT/HttpServer/index_html.h"
 printf ')RAWHTML";\n' >> "$ROOT/HttpServer/index_html.h"
 
+echo "Generant json_horari.h..."
+mkdir -p "$ROOT/ControlHorari"
+printf 'static const char JSON_HORARI[] = R"RAWJSON(\n' > "$ROOT/ControlHorari/json_horari.h"
+cat "$ROOT/docs/json_horari.json" >> "$ROOT/ControlHorari/json_horari.h"
+printf ')RAWJSON";\n' >> "$ROOT/ControlHorari/json_horari.h"
+
 echo "Compilant mongoose..."
 $CC -c -O1 \
     -I"$ROOT/mongoose" \
@@ -55,6 +61,7 @@ $CXX -std=gnu++17 -Wall -O1 $STATIC_FLAG \
     -I"$QPCPP/ports/$QP_PORT" \
     "$ROOT/main.cpp" \
     "$ROOT/ControlRemot/ControlRemot.cpp" \
+    "$ROOT/ControlHorari/ControlHorari.cpp" \
     "$ROOT/HttpServer/HttpServer.cpp" \
     "$QPCPP/src/qf/qep_hsm.cpp" \
     "$QPCPP/src/qf/qep_msm.cpp" \

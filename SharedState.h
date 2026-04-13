@@ -1,6 +1,7 @@
 #pragma once
 #include <atomic>
 #include <mutex>
+#include <string>
 #include <unordered_map>
 
 // ── SharedState ───────────────────────────────────────────────────────────────
@@ -19,6 +20,11 @@ struct SharedState {
     std::mutex                          mtx;
     std::unordered_map<int, bool>       outputs;     // estat resultant (legacy)
     std::unordered_map<int, OutputInfo> outputsFull;  // estat complet
+    int                                 horariHour   = 0;
+    int                                 horariMinute = 0;
+    int                                 horariWday   = 0; // 0=dilluns..6=diumenge
+    std::string                         horariJson;       // JSON actual del calendari
+    std::atomic<bool>                   horariLoadPending{false};
     std::atomic<bool>                   push_pending{false};
 };
 

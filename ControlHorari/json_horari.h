@@ -1,0 +1,70 @@
+static const char JSON_HORARI[] = R"RAWJSON(
+{
+  "dilluns": [
+    { "id": 10, "act": "on",  "time": "07:00" },
+    { "id": 10, "act": "off", "time": "22:00" },
+    { "id": 11, "act": "on",  "time": "08:30" },
+    { "id": 11, "act": "off", "time": "13:00" },
+    { "id": 12, "act": "on",  "time": "18:00" },
+    { "id": 12, "act": "off", "time": "23:00" },
+    { "id": 13, "act": "on",  "time": "06:00" },
+    { "id": 13, "act": "off", "time": "09:00" }
+  ],
+  "dimarts": [
+    { "id": 10, "act": "on",  "time": "07:00" },
+    { "id": 10, "act": "off", "time": "22:00" },
+    { "id": 11, "act": "on",  "time": "08:30" },
+    { "id": 11, "act": "off", "time": "13:00" },
+    { "id": 12, "act": "on",  "time": "18:00" },
+    { "id": 12, "act": "off", "time": "23:00" },
+    { "id": 13, "act": "on",  "time": "06:00" },
+    { "id": 13, "act": "off", "time": "09:00" }
+  ],
+  "dimecres": [
+    { "id": 10, "act": "on",  "time": "07:00" },
+    { "id": 10, "act": "off", "time": "22:00" },
+    { "id": 11, "act": "on",  "time": "08:30" },
+    { "id": 11, "act": "off", "time": "13:00" },
+    { "id": 12, "act": "on",  "time": "18:00" },
+    { "id": 12, "act": "off", "time": "23:00" },
+    { "id": 13, "act": "on",  "time": "06:00" },
+    { "id": 13, "act": "off", "time": "09:00" }
+  ],
+  "dijous": [
+    { "id": 10, "act": "on",  "time": "07:00" },
+    { "id": 10, "act": "off", "time": "22:00" },
+    { "id": 11, "act": "on",  "time": "08:30" },
+    { "id": 11, "act": "off", "time": "13:00" },
+    { "id": 12, "act": "on",  "time": "18:00" },
+    { "id": 12, "act": "off", "time": "23:00" },
+    { "id": 13, "act": "on",  "time": "06:00" },
+    { "id": 13, "act": "off", "time": "09:00" }
+  ],
+  "divendres": [
+    { "id": 10, "act": "on",  "time": "07:00" },
+    { "id": 10, "act": "off", "time": "23:30" },
+    { "id": 11, "act": "on",  "time": "08:30" },
+    { "id": 11, "act": "off", "time": "13:00" },
+    { "id": 12, "act": "on",  "time": "18:00" },
+    { "id": 12, "act": "off", "time": "23:59" },
+    { "id": 13, "act": "on",  "time": "06:00" },
+    { "id": 13, "act": "off", "time": "09:00" }
+  ],
+  "dissabte": [
+    { "id": 10, "act": "on",  "time": "09:00" },
+    { "id": 10, "act": "off", "time": "23:59" },
+    { "id": 12, "act": "on",  "time": "17:00" },
+    { "id": 12, "act": "off", "time": "23:59" },
+    { "id": 13, "act": "on",  "time": "08:00" },
+    { "id": 13, "act": "off", "time": "11:00" }
+  ],
+  "diumenge": [
+    { "id": 10, "act": "on",  "time": "09:00" },
+    { "id": 10, "act": "off", "time": "22:00" },
+    { "id": 12, "act": "on",  "time": "17:00" },
+    { "id": 12, "act": "off", "time": "22:00" },
+    { "id": 13, "act": "on",  "time": "08:00" },
+    { "id": 13, "act": "off", "time": "11:00" }
+  ]
+}
+)RAWJSON";

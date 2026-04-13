@@ -13,14 +13,14 @@ h1{text-align:center;margin-bottom:24px;color:#00d4ff}
 .status .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:middle}
 .dot.on{background:#0f0}.dot.off{background:#f44}
 
-.outputs{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;margin-bottom:32px}
-.output-card{background:#16213e;border-radius:12px;padding:20px;min-width:200px;text-align:center;border:2px solid #0f3460}
-.output-card.active{border-color:#00d4ff;box-shadow:0 0 15px rgba(0,212,255,.3)}
-.output-id{font-size:14px;color:#888;margin-bottom:8px}
-.output-state{font-size:28px;font-weight:bold;margin-bottom:8px}
+.outputs{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.output-card{background:#16213e;border-radius:8px;padding:10px;min-width:140px;text-align:center;border:2px solid #0f3460}
+.output-card.active{border-color:#00d4ff;box-shadow:0 0 10px rgba(0,212,255,.3)}
+.output-id{font-size:11px;color:#888;margin-bottom:4px}
+.output-state{font-size:20px;font-weight:bold;margin-bottom:4px}
 .output-state.on{color:#4caf50}
 .output-state.off{color:#666}
-.output-detail{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;font-size:12px;margin-bottom:12px;text-align:left;padding:0 8px}
+.output-detail{display:grid;grid-template-columns:1fr 1fr;gap:2px 8px;font-size:10px;margin-bottom:8px;text-align:left;padding:0 4px}
 .output-detail .label{color:#888}
 .output-detail .val{text-align:right;font-weight:600}
 .output-detail .val.on{color:#4caf50}.output-detail .val.off{color:#666}
@@ -28,7 +28,7 @@ h1{text-align:center;margin-bottom:24px;color:#00d4ff}
 .output-mode{font-size:12px;color:#aaa;margin-bottom:12px}
 
 .controls{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
-.btn{border:none;border-radius:6px;padding:8px 14px;cursor:pointer;font-size:13px;font-weight:600;transition:all .2s}
+.btn{border:none;border-radius:4px;padding:5px 9px;cursor:pointer;font-size:11px;font-weight:600;transition:all .2s}
 .btn:hover{transform:scale(1.05)}
 .btn-on{background:#4caf50;color:#fff}
 .btn-off{background:#f44;color:#fff}
@@ -54,13 +54,20 @@ h1{text-align:center;margin-bottom:24px;color:#00d4ff}
 <h1>ControlSortides</h1>
 <div class="status" id="ws-status"><span class="dot off"></span>Desconnectat</div>
 
-<div class="outputs" id="outputs"></div>
+<div style="display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start;max-width:1400px;margin:0 auto 20px">
+  <div class="section" style="flex:1 1 400px;margin:0">
+    <h2>ControlHorari</h2>
+    <div id="horari-time" style="text-align:center;font-size:32px;color:#00d4ff;font-weight:bold;font-family:monospace;margin-bottom:12px">-- --:--</div>
+    <textarea id="horari-json" spellcheck="false" style="width:100%;height:280px;background:#0a0a1a;color:#e0e0e0;border:1px solid #0f3460;border-radius:8px;padding:10px;font-family:monospace;font-size:12px;resize:vertical"></textarea>
+    <div style="display:flex;gap:8px;justify-content:center;margin-top:10px">
+      <button class="btn btn-send" onclick="loadHorari()" style="margin:0">Carregar</button>
+      <button class="btn btn-send" onclick="applyHorari()" style="margin:0">Aplicar</button>
+    </div>
+  </div>
 
-<div class="section">
-  <h2>Gestio de sortides</h2>
-  <div class="io-form" style="justify-content:center">
-    <label>ID:</label><input type="number" id="new-id" value="10">
-    <button class="btn btn-send" onclick="createOutput()" style="margin:0">Crear</button>
+  <div class="section" style="flex:2 1 600px;margin:0">
+    <h2>ControlRemot</h2>
+    <div class="outputs" id="outputs"></div>
   </div>
 </div>
 
@@ -74,6 +81,7 @@ const outputsEl = document.getElementById('outputs');
 const logEl = document.getElementById('log');
 const wsStatus = document.getElementById('ws-status');
 let currentState = {};
+let lastRenderKey = '';
 
 // ── WebSocket ──────────────────────────────────────────────────────
 function connect() {
@@ -91,14 +99,48 @@ function connect() {
       const prev = Object.fromEntries(
         Object.entries(currentState).map(([k,v]) => [k, {...v}]));
       currentState = data.outputs || {};
-      renderOutputs();
+      if (data.time) {
+        document.getElementById('horari-time').textContent =
+          (data.day || '') + ' ' + data.time;
+      }
+      const key = JSON.stringify(currentState);
+      if (key !== lastRenderKey) {
+        lastRenderKey = key;
+        renderOutputs();
+      }
       logChanges(prev, currentState);
     } catch(err) {
-      addLog('ERROR: ' + err.message + ' | data: ' + e.data.substring(0,200));
+      addLog('Client', 'WS parse', 'ERROR: ' + err.message + ' | data: ' + e.data.substring(0,200));
     }
   };
 }
 connect();
+
+// ── Programació (JSON editable) ────────────────────────────────────
+function loadHorari() {
+  fetch('/horari').then(r => r.text()).then(txt => {
+    try {
+      document.getElementById('horari-json').value = JSON.stringify(JSON.parse(txt), null, 2);
+    } catch {
+      document.getElementById('horari-json').value = txt;
+    }
+    addLog('Client', 'GET /horari', 'horari carregat');
+  }).catch(err => addLog('Client', 'GET /horari', 'ERROR: ' + err.message));
+}
+
+function applyHorari() {
+  const body = document.getElementById('horari-json').value;
+  try { JSON.parse(body); }
+  catch (e) { addLog('Client', '-', 'ERROR JSON invàlid: ' + e.message); return; }
+  fetch('/horari', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body
+  }).then(() => addLog('Client', 'POST /horari → SharedState → ControlHorari', 'horari aplicat'))
+    .catch(err => addLog('Client', 'POST /horari', 'ERROR: ' + err.message));
+}
+
+loadHorari();
 
 // ── Render sortides ────────────────────────────────────────────────
 function renderOutputs() {
@@ -116,7 +158,7 @@ function renderOutputs() {
         <div class="output-id">Estat resultant ${id}</div>
         <div class="output-state ${on ? 'on' : 'off'}">${on ? 'ON' : 'OFF'}</div>
         <div class="output-detail">
-          <span class="label">Estat a l'entrada:</span><span class="val ${o.physical?'on':'off'}" style="cursor:pointer;text-decoration:underline" onclick="setPhysical(${id}, ${!o.physical})" title="Click per togglejar">${o.physical?'ON':'OFF'}</span>
+          <span class="label">Estat a l'entrada:</span><span class="val ${o.physical?'on':'off'}">${o.physical?'ON':'OFF'}</span>
           <span class="label">Última comanda:</span><span class="val ${o.commanded?'on':'off'}">${o.commanded?'ON':'OFF'}</span>
           <span class="label">Mode:</span><span class="val ${isRemote?'remote':'auto'}">${o.mode}</span>
         </div>
@@ -138,27 +180,7 @@ function ctrlAction(id, action) {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify([{id, action}])
-  }).then(() => addLog(`control: ${id} -> ${action}`));
-}
-
-// ── Injectar estat fisic ───────────────────────────────────────────
-function setPhysical(id, state) {
-  fetch('/io_state', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({outputs: [{id, state}]})
-  }).then(() => addLog(`fisic ${id} -> ${state ? 'ON' : 'OFF'}`));
-}
-
-// ── Crear / eliminar sortides ──────────────────────────────────────
-function createOutput() {
-  const id = parseInt(document.getElementById('new-id').value);
-  if (isNaN(id)) return;
-  fetch('/io_state', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({outputs: [{id, state: false}]})
-  }).then(() => addLog(`crear sortida ${id}`));
+  }).then(() => addLog('Client', 'POST /control → ControlRemot queue', `${id} -> ${action}`));
 }
 
 function deleteOutput(id) {
@@ -166,13 +188,16 @@ function deleteOutput(id) {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({id})
-  }).then(() => addLog(`eliminar sortida ${id}`));
+  }).then(() => addLog('Client', 'POST /delete → ControlRemot queue', `eliminar ${id}`));
 }
 
 // ── Log ────────────────────────────────────────────────────────────
-function addLog(msg) {
+function addLog(origin, dest, msg) {
   const t = new Date().toLocaleTimeString();
-  logEl.innerHTML = `<div class="log-entry"><span class="time">${t}</span> ${msg}</div>` + logEl.innerHTML;
+  const color = origin === 'ControlRemot' ? '#00d4ff' : '#ff9800';
+  const tag = `<span style="color:${color};font-weight:600">[${origin}]</span>`;
+  const destTag = dest && dest !== '-' ? `<span style="color:#888"> → ${dest}</span>` : '';
+  logEl.innerHTML = `<div class="log-entry"><span class="time">${t}</span> ${tag}${destTag} ${msg}</div>` + logEl.innerHTML;
 }
 
 function logChanges(prev, curr) {
@@ -180,7 +205,7 @@ function logChanges(prev, curr) {
     const p = prev[id], c = curr[id];
     if (!p || p.result !== c.result || p.mode !== c.mode) {
       const from = !p ? '---' : (p.result ? 'ON' : 'OFF');
-      addLog(`<span class="change">output ${id}: ${from} -> ${c.result ? 'ON' : 'OFF'} [${c.mode}]</span>`);
+      addLog('ControlRemot', 'WS → Client', `<span class="change">output ${id}: ${from} -> ${c.result ? 'ON' : 'OFF'} [${c.mode}]</span>`);
     }
   }
 }

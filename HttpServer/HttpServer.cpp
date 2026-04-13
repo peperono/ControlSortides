@@ -9,6 +9,7 @@
 #include <cstdio>
 #include <mutex>
 #include "index_html.h"
+#include "../ControlHorari/json_horari.h"
 
 // ── Server thread ─────────────────────────────────────────────────────────────
 
@@ -19,8 +20,18 @@ static QP::QActive*       s_controlRemot = nullptr;
 // ── Helpers JSON ──────────────────────────────────────────────────────────────
 
 static std::string outputs_to_json(
-        const std::unordered_map<int, OutputInfo>& m) {
-    std::string s = "{\"outputs\":{";
+        const std::unordered_map<int, OutputInfo>& m,
+        int hour, int minute, int wday) {
+    static const char* DAYS[7] = {
+        "dilluns","dimarts","dimecres","dijous","divendres","dissabte","diumenge"};
+    char tbuf[8];
+    std::snprintf(tbuf, sizeof(tbuf), "%02d:%02d", hour, minute);
+
+    std::string s = "{\"time\":\"";
+    s += tbuf;
+    s += "\",\"day\":\"";
+    s += (wday >= 0 && wday < 7) ? DAYS[wday] : "";
+    s += "\",\"outputs\":{";
     bool first = true;
     for (auto const& [k, v] : m) {
         if (!first) s += ",";
@@ -43,12 +54,16 @@ static void push_if_pending(struct mg_mgr* mgr) {
     se.push_pending.store(false);
 
     std::unordered_map<int, OutputInfo> outputs;
+    int hh, mm, wd;
     {
         std::lock_guard<std::mutex> lk(se.mtx);
         outputs = se.outputsFull;
+        hh = se.horariHour;
+        mm = se.horariMinute;
+        wd = se.horariWday;
     }
 
-    std::string msg = outputs_to_json(outputs);
+    std::string msg = outputs_to_json(outputs, hh, mm, wd);
     for (struct mg_connection* c = mgr->conns; c != nullptr; c = c->next) {
         if (c->is_websocket) {
             mg_ws_send(c, msg.c_str(), msg.size(), WEBSOCKET_OP_TEXT);
@@ -114,6 +129,33 @@ static void http_fn(struct mg_connection* c, int ev, void* ev_data) {
             mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{}");
         }
 
+        // ── GET /horari ───────────────────────────────────────────────────────
+        else if (mg_match(hm->uri, mg_str("/horari"), NULL)
+                 && mg_match(hm->method, mg_str("GET"), NULL))
+        {
+            std::string body;
+            {
+                std::lock_guard<std::mutex> lk(se.mtx);
+                body = se.horariJson;
+            }
+            mg_http_reply(c, 200, "Content-Type: application/json\r\n",
+                          "%.*s", (int)body.size(), body.c_str());
+        }
+
+        // ── POST /horari ──────────────────────────────────────────────────────
+        else if (mg_match(hm->uri, mg_str("/horari"), NULL)
+                 && mg_match(hm->method, mg_str("POST"), NULL))
+        {
+            if (hm->body.len > 0) {
+                {
+                    std::lock_guard<std::mutex> lk(se.mtx);
+                    se.horariJson.assign(hm->body.buf, hm->body.len);
+                }
+                se.horariLoadPending.store(true);
+            }
+            mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{}");
+        }
+
         // ── POST /delete ──────────────────────────────────────────────────────
         else if (mg_match(hm->uri, mg_str("/delete"), NULL)
                  && mg_match(hm->method, mg_str("POST"), NULL))
@@ -143,13 +185,16 @@ static void http_fn(struct mg_connection* c, int ev, void* ev_data) {
         (void)ev_data;
 
     } else if (ev == MG_EV_WS_OPEN) {
-        // Envia l'estat actual al client que acaba de connectar
         std::unordered_map<int, OutputInfo> outputs;
+        int hh, mm, wd;
         {
             std::lock_guard<std::mutex> lk(se.mtx);
             outputs = se.outputsFull;
+            hh = se.horariHour;
+            mm = se.horariMinute;
+            wd = se.horariWday;
         }
-        std::string msg = outputs_to_json(outputs);
+        std::string msg = outputs_to_json(outputs, hh, mm, wd);
         mg_ws_send(c, msg.c_str(), msg.size(), WEBSOCKET_OP_TEXT);
     }
 }

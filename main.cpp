@@ -3,6 +3,8 @@
 #include "signals.h"
 #include "SharedState.h"
 #include "ControlRemot/ControlRemot.h"
+#include "ControlHorari/ControlHorari.h"
+#include "ControlHorari/json_horari.h"
 #include "HttpServer/HttpServer.h"
 #include <cstdio>
 #include <cstdlib>
@@ -12,10 +14,12 @@
 SharedState se; // definició de l'extern declarat a SharedState.h
 
 static ControlRemot   s_controlRemot;
+static ControlHorari  s_controlHorari;
 
 // ── Cues d'events ─────────────────────────────────────────────────────────────
 
-static QP::QEvtPtr s_controlRemotQSto[16];
+static QP::QEvtPtr s_controlRemotQSto[64];
+static QP::QEvtPtr s_controlHorariQSto[16];
 
 // ── Pool d'events dinàmics ────────────────────────────────────────────────────
 // Un sol pool dimensionat per al tipus més gran (IoStateHttpEvt).
@@ -39,8 +43,14 @@ int main() {
     // Pool per als events dinàmics (OutputCmdEvt, OutputModeEvt, IoStateHttpEvt…)
     QP::QF::poolInit(s_poolSto, sizeof(s_poolSto), sizeof(s_poolSto[0]));
 
-    s_controlRemot.start(1U,
+    s_controlRemot.start(2U,
         s_controlRemotQSto, Q_DIM(s_controlRemotQSto),
+        nullptr, 0U);
+
+    se.horariJson.assign(JSON_HORARI, sizeof(JSON_HORARI) - 1);
+    s_controlHorari.loadJson(JSON_HORARI, sizeof(JSON_HORARI) - 1);
+    s_controlHorari.start(1U,
+        s_controlHorariQSto, Q_DIM(s_controlHorariQSto),
         nullptr, 0U);
 
     // Servidor HTTP en el seu thread (Mongoose)

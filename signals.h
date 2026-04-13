@@ -12,7 +12,7 @@ enum Signals : QP::QSignal {
     CTRL_OUTPUT_RETURN_AUTO_SIG,            // intern: handleJson → ControlRemot
     CTRL_OUTPUT_DELETE_SIG,                 // postat per HttpServer (thread Mongoose)
     OUTPUT_RESULT_SIG,                      // publicat per ControlRemot
-    IO_MONITOR_TICK_SIG,                    // intern: QTimeEvt de IOStateMonitor
+    HORARI_TICK_SIG,                        // intern: QTimeEvt de ControlHorari
     MAX_SIG
 };
 

@@ -1,0 +1,141 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/28.2.8 Chrome/140.0.7339.240 Electron/38.4.0 Safari/537.36" version="28.2.8">
+  <diagram name="ControlRemot" id="controlremot">
+    <mxGraphModel dx="4259" dy="2864" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="http" value="HttpServer&#xa;(thread Mongoose)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;fontStyle=1" parent="1" vertex="1">
+          <mxGeometry x="-1619" y="-318" width="149" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ws" value="Client Web&#xa;(WebSocket /ws)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;fontStyle=1" parent="1" vertex="1">
+          <mxGeometry x="-165" y="-549" width="136" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ch" value="ControlHorari (QP::QActive)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=16;fontStyle=1;verticalAlign=top;spacingTop=8" parent="1" vertex="1">
+          <mxGeometry x="-1417" y="-790" width="499" height="151" as="geometry" />
+        </mxCell>
+        <mxCell id="ch_tick" value="RellotgeTickEvt&#xa;(RELLOTGE_TICK_SIG, subscribe)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11" parent="1" vertex="1">
+          <mxGeometry x="-1417" y="-740" width="199" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ch_reload" value="ch_state.horariJson" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11" parent="1" vertex="1">
+          <mxGeometry x="-1417" y="-690" width="199" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ch_out_io" value="OutputStateEvt&#xa;(OUTPUT_STATE_SIG, PUBLISH)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11" parent="1" vertex="1">
+          <mxGeometry x="-1108" y="-690" width="189" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="rl" value="Rellotge (QP::QActive)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=16;fontStyle=1;verticalAlign=top;spacingTop=8" parent="1" vertex="1">
+          <mxGeometry x="-1400" y="-1050" width="469" height="151" as="geometry" />
+        </mxCell>
+        <mxCell id="rl_tick" value="RELLOTGE_TICK_INTERNAL_SIG&#xa;(QTimeEvt, cada 50 ms)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11" parent="1" vertex="1">
+          <mxGeometry x="-1400" y="-949" width="189" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="rl_out_pub" value="RellotgeTickEvt&#xa;(RELLOTGE_TICK_SIG, PUBLISH)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11" parent="1" vertex="1">
+          <mxGeometry x="-1120" y="-949" width="189" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="rl_out_ss" value="rellotge_state.hour/minute/wday" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11" parent="1" vertex="1">
+          <mxGeometry x="-1120" y="-999" width="189" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="cr" value="ControlRemot (QP::QActive)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=16;fontStyle=1;verticalAlign=top;spacingTop=8" parent="1" vertex="1">
+          <mxGeometry x="-821" y="-510" width="553" height="341" as="geometry" />
+        </mxCell>
+        <mxCell id="in_io" value="OutputStateEvt&#xa;(OUTPUT_STATE_SIG)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11" parent="1" vertex="1">
+          <mxGeometry x="-821" y="-449" width="213" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="in_cmd" value="OutputCmdEvt&#xa;(CTRL_OUTPUT_CMD_SIG)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11" parent="1" vertex="1">
+          <mxGeometry x="-821" y="-394" width="213" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="in_mode" value="OutputModeEvt&#xa;(CTRL_OUTPUT_MODE_SIG)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11" parent="1" vertex="1">
+          <mxGeometry x="-821" y="-339" width="213" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="in_ret" value="OutputReturnAutoEvt&#xa;(CTRL_OUTPUT_RETURN_AUTO_SIG)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11" parent="1" vertex="1">
+          <mxGeometry x="-821" y="-284" width="213" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="in_del" value="OutputDeleteEvt&#xa;(CTRL_OUTPUT_DELETE_SIG)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11" parent="1" vertex="1">
+          <mxGeometry x="-821" y="-229" width="213" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="out_pub" value="OutputResultEvt&#xa;(OUTPUT_RESULT_SIG, PUBLISH)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11" parent="1" vertex="1">
+          <mxGeometry x="-475" y="-394" width="207" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="out_ss" value="cr_state.outputsResult" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11" parent="1" vertex="1">
+          <mxGeometry x="-475" y="-344" width="207" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5" parent="1" source="http" target="in_cmd" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="-1470" y="-289" />
+              <mxPoint x="-1090" y="-289" />
+              <mxPoint x="-1090" y="-369" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5" parent="1" source="http" target="in_mode" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="-1470" y="-289" />
+              <mxPoint x="-1090" y="-289" />
+              <mxPoint x="-1090" y="-314" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5" parent="1" source="http" target="in_ret" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="-1470" y="-289" />
+              <mxPoint x="-1090" y="-289" />
+              <mxPoint x="-1090" y="-259" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5" parent="1" source="http" target="in_del" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="-1470" y="-289" />
+              <mxPoint x="-1090" y="-289" />
+              <mxPoint x="-1090" y="-204" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5" parent="1" source="out_ss" target="ws" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="-228" y="-319" />
+              <mxPoint x="-228" y="-519" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e6" value="POST /horari" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.2;entryX=0;entryY=0.5" parent="1" source="http" target="ch_reload" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e9" value="GET /horari" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0;exitY=0.8;entryX=1;entryY=0.3;dashed=1" parent="1" source="ch_reload" target="http" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e7" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="ch_out_io" target="in_io" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="-868" y="-665" />
+              <mxPoint x="-868" y="-424" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e10" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="rl_out_pub" target="ch_tick" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="-880" y="-920" />
+              <mxPoint x="-880" y="-850" />
+              <mxPoint x="-1461" y="-850" />
+              <mxPoint x="-1461" y="-715" />
+            </Array>
+            <mxPoint x="-1471" y="-929" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e8" value="WS push" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.2" parent="1" source="rl_out_ss" target="ws" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="-228" y="-974" />
+              <mxPoint x="-228" y="-537" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

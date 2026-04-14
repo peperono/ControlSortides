@@ -23,14 +23,14 @@ mode == REMOTE  →  result segueix commanded
 ```
 
 En `AUTO`, una comanda puntual aplica `result = commanded` immediatament,
-però el proper `IO_STATE_HTTP_SIG` tornarà a sobreescriure `result` amb
+però el proper `OUTPUT_STATE_SIG` tornarà a sobreescriure `result` amb
 `physical`. El camp `commanded` queda com a "rastre" de l'última ordre.
 
 ## Entrades (events)
 
 | Event                  | Signal                        | Origen          | Efecte |
 |------------------------|-------------------------------|-----------------|--------|
-| `IoStateHttpEvt`       | `IO_STATE_HTTP_SIG`           | `POST /io_state`| Actualitza `physical`; en `AUTO` també `result` |
+| `OutputStateEvt`       | `OUTPUT_STATE_SIG`            | `POST /io_state`| Actualitza `physical`; en `AUTO` també `result` |
 | `OutputCmdEvt`         | `CTRL_OUTPUT_CMD_SIG`         | `POST /control` | Posa `commanded = result = activate` |
 | `OutputModeEvt`        | `CTRL_OUTPUT_MODE_SIG`        | `POST /control` | Canvia `mode`, recalcula `result` |
 | `OutputReturnAutoEvt`  | `CTRL_OUTPUT_RETURN_AUTO_SIG` | `POST /control` | Força `mode = AUTO` (`-1` = totes) |
@@ -45,7 +45,7 @@ Després de qualsevol canvi, `publishResult()`:
 
 1. **Publica** `OutputResultEvt` amb signal `OUTPUT_RESULT_SIG` al bus QP
    (per a qualsevol AO subscrit).
-2. **Escriu** `SharedState::outputsFull` (mapa complet `id → OutputInfo`)
+2. **Escriu** `SharedState::outputsResult` (mapa complet `id → OutputInfo`)
    sota mutex i marca `se.push_pending = true`.
 
 El thread del `HttpServer` veu el flag i envia l'estat per WebSocket a tots

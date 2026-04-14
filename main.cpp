@@ -23,9 +23,9 @@ static QP::QEvtPtr s_controlHorariQSto[32];
 static QP::QEvtPtr s_rellotgeQSto[16];
 
 // ── Pool d'events dinàmics ────────────────────────────────────────────────────
-// Un sol pool dimensionat per al tipus més gran (IoStateEvt).
+// Un sol pool dimensionat per al tipus més gran (OutputStateEvt).
 
-static QF_MPOOL_EL(IoStateEvt) s_poolSto[8];
+static QF_MPOOL_EL(OutputStateEvt) s_poolSto[8];
 
 // ── Llista de subscripcions publish-subscribe ─────────────────────────────────
 
@@ -41,7 +41,7 @@ int main() {
     // Taula publish-subscribe
     QP::QActive::psInit(s_subscrSto, Q_DIM(s_subscrSto));
 
-    // Pool per als events dinàmics (OutputCmdEvt, OutputModeEvt, IoStateEvt…)
+    // Pool per als events dinàmics (OutputCmdEvt, OutputModeEvt, OutputStateEvt…)
     QP::QF::poolInit(s_poolSto, sizeof(s_poolSto), sizeof(s_poolSto[0]));
 
     s_controlRemot.start(2U,

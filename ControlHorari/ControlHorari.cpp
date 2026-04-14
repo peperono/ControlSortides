@@ -61,11 +61,11 @@ Q_STATE_DEF(ControlHorari, operating) {
                 if (m.hour == hh && m.minute == mm) ++matches;
             }
             if (matches > 0) {
-                auto* ev = Q_NEW(IoStateEvt, IO_STATE_SIG);
+                auto* ev = Q_NEW(OutputStateEvt, OUTPUT_STATE_SIG);
                 ev->n_outputs = 0;
                 for (auto const& m : m_schedule[wday]) {
                     if (m.hour == hh && m.minute == mm
-                        && ev->n_outputs < IoStateEvt::MAX_OUTPUTS) {
+                        && ev->n_outputs < OutputStateEvt::MAX_OUTPUTS) {
                         ev->outputs[ev->n_outputs++] = { m.id, m.on };
                         std::printf("[ControlHorari] %02d:%02d output %d -> %s\n",
                                     hh, mm, m.id, m.on ? "ON" : "OFF");

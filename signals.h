@@ -5,7 +5,7 @@
 // ── Signals ───────────────────────────────────────────────────────────────────
 
 enum Signals : QP::QSignal {
-    IO_STATE_SIG = QP::Q_USER_SIG,          // estat físic de sortides
+    OUTPUT_STATE_SIG = QP::Q_USER_SIG,       // estat físic de sortides
     CTRL_OUTPUT_CMD_SIG,                    // intern: handleJson → ControlRemot
     CTRL_OUTPUT_MODE_SIG,                   // intern: handleJson → ControlRemot
     CTRL_OUTPUT_RETURN_AUTO_SIG,            // intern: handleJson → ControlRemot
@@ -50,7 +50,7 @@ struct OutputDeleteEvt : public QP::QEvt {
 // Estat físic de les sortides. Pool event amb arrays de mida fixa:
 // compatible amb QP memory pools. Publicat per Rellotge→ControlHorari i
 // injectat via HttpServer (POST /io_state).
-struct IoStateEvt : public QP::QEvt {
+struct OutputStateEvt : public QP::QEvt {
     static constexpr int MAX_OUTPUTS = 32;
     struct Entry { int id; bool state; };
     Entry outputs[MAX_OUTPUTS];

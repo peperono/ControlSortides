@@ -17,7 +17,7 @@ ControlRemot::ControlRemot() noexcept
 
 Q_STATE_DEF(ControlRemot, initial) {
     Q_UNUSED_PAR(e);
-    subscribe(IO_STATE_SIG); // ControlHorari publica estat físic
+    subscribe(OUTPUT_STATE_SIG); // ControlHorari publica estat físic
     return tran(&ControlRemot::operating);
 }
 
@@ -34,8 +34,8 @@ Q_STATE_DEF(ControlRemot, operating) {
         }
 
         // Entrada: estat físic injectat via HTTP (POST /io_state)
-        case IO_STATE_SIG: {
-            auto const* ev = Q_EVT_CAST(IoStateEvt);
+        case OUTPUT_STATE_SIG: {
+            auto const* ev = Q_EVT_CAST(OutputStateEvt);
             for (int i = 0; i < ev->n_outputs; ++i) {
                 auto& out    = m_outputs[ev->outputs[i].id];
                 out.physical = ev->outputs[i].state;
@@ -50,7 +50,7 @@ Q_STATE_DEF(ControlRemot, operating) {
 
         // Comanda activar/desactivar
         // Ambdós modes: aplica de seguida. En AUTO el mode no canvia; el pròxim
-        // IO_STATE_SIG tornarà a reflectir l'estat físic.
+        // OUTPUT_STATE_SIG tornarà a reflectir l'estat físic.
         case CTRL_OUTPUT_CMD_SIG: {
             auto const* ev = Q_EVT_CAST(OutputCmdEvt);
             auto& out      = m_outputs[ev->output_id];
@@ -122,9 +122,9 @@ void ControlRemot::publishResult() {
 
     {
         std::lock_guard<std::mutex> lk(cr_state.mtx);
-        cr_state.outputsFull.clear();
+        cr_state.outputsResult.clear();
         for (auto const& [id, out] : m_outputs) {
-            cr_state.outputsFull[id] = {out.physical, out.commanded, out.result,
+            cr_state.outputsResult[id] = {out.physical, out.commanded, out.result,
                                         out.mode == OutputEntry::Mode::REMOTE};
         }
     }

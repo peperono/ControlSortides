@@ -9,7 +9,7 @@
 // ── ControlHorari ─────────────────────────────────────────────────────────────
 // Active Object que manté un calendari setmanal de maniobres i, en rebre
 // RELLOTGE_TICK_SIG, publica les maniobres que coincideixen amb l'hora actual
-// (IoStateEvt amb IO_STATE_SIG) perquè ControlRemot les apliqui.
+// (OutputStateEvt amb OUTPUT_STATE_SIG) perquè ControlRemot les apliqui.
 //
 // Format del JSON:
 //   { "dilluns":[{"id":10,"act":"on","time":"07:30"}, ...], "dimarts":[...], ... }

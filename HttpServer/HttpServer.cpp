@@ -60,7 +60,7 @@ static void push_if_pending(struct mg_mgr* mgr) {
     int hh, mm, wd;
     {
         std::lock_guard<std::mutex> lk(cr_state.mtx);
-        outputs = cr_state.outputsFull;
+        outputs = cr_state.outputsResult;
     }
     {
         std::lock_guard<std::mutex> lk(rellotge_state.mtx);
@@ -111,11 +111,11 @@ static void http_fn(struct mg_connection* c, int ev, void* ev_data) {
                 return;
             }
 
-            auto* ev = Q_NEW(IoStateEvt, IO_STATE_SIG);
+            auto* ev = Q_NEW(OutputStateEvt, OUTPUT_STATE_SIG);
             ev->n_outputs = 0;
 
             struct mg_str json = hm->body;
-            for (int i = 0; i < IoStateEvt::MAX_OUTPUTS; ++i) {
+            for (int i = 0; i < OutputStateEvt::MAX_OUTPUTS; ++i) {
                 char path[32];
                 std::snprintf(path, sizeof(path), "$.outputs[%d]", i);
                 int elen = 0;
@@ -195,7 +195,7 @@ static void http_fn(struct mg_connection* c, int ev, void* ev_data) {
         int hh, mm, wd;
         {
             std::lock_guard<std::mutex> lk(cr_state.mtx);
-            outputs = cr_state.outputsFull;
+            outputs = cr_state.outputsResult;
         }
         {
             std::lock_guard<std::mutex> lk(rellotge_state.mtx);

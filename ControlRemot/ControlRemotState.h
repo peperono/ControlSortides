@@ -12,7 +12,7 @@ struct OutputInfo {
 
 struct ControlRemotState {
     std::mutex                          mtx;
-    std::unordered_map<int, OutputInfo> outputsFull;
+    std::unordered_map<int, OutputInfo> outputsResult;
     std::atomic<bool>                   push_pending{false};
 };
 

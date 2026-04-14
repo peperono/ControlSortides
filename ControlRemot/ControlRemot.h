@@ -8,7 +8,7 @@
 // Active Object que gestiona el mode i l'estat resultant de cada sortida.
 //
 // Entrades:
-//   - IO_STATE_SIG  → estat físic de les sortides (subscrit)
+//   - OUTPUT_STATE_SIG  → estat físic de les sortides (subscrit)
 //   - handleJson(buf, len)  → comandes JSON del thread Mongoose (thread-safe)
 //
 // Sortida:

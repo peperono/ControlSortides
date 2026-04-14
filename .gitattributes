@@ -1,0 +1,21 @@
+# Normalitza tots els fitxers de text a LF al repositori
+* text=auto eol=lf
+
+# Fitxers de codi explícitament LF
+*.cpp   text eol=lf
+*.h     text eol=lf
+*.hpp   text eol=lf
+*.c     text eol=lf
+*.sh    text eol=lf
+*.json  text eol=lf
+*.html  text eol=lf
+*.md    text eol=lf
+*.cmake text eol=lf
+
+# Fitxers binaris (no tocar)
+*.exe   binary
+*.o     binary
+*.a     binary
+*.lib   binary
+*.png   binary
+*.jpg   binary

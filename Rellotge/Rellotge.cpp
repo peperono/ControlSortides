@@ -19,7 +19,11 @@ Q_STATE_DEF(Rellotge, initial) {
 
     std::time_t now = std::time(nullptr);
     std::tm lt;
+#ifdef _WIN32
+    localtime_s(&lt, &now);
+#else
     localtime_r(&now, &lt);
+#endif
     m_wday   = (lt.tm_wday + 6) % 7;
     m_hour   = lt.tm_hour;
     m_minute = lt.tm_min;

@@ -1,5 +1,6 @@
 #include "ControlRemot.h"
 #include "ControlRemotState.h"
+#include "../LogState.h"
 #include "../mongoose/mongoose.h"
 #include <cstdio>
 #include <mutex>
@@ -129,6 +130,15 @@ void ControlRemot::publishResult() {
         }
     }
     cr_state.push_pending.store(true);
+
+    std::string detail;
+    for (auto const& [id, out] : m_outputs) {
+        if (!detail.empty()) detail += ", ";
+        detail += std::to_string(id) + "=";
+        detail += out.result ? "ON" : "OFF";
+        detail += out.mode == OutputEntry::Mode::REMOTE ? "(REM)" : "(AUTO)";
+    }
+    log_append("ControlRemot", "OUTPUT_RESULT_SIG", detail);
 
     PUBLISH(&m_resultEvt, this);
 }

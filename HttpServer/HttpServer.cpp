@@ -3,6 +3,7 @@
 #include "../ControlRemot/ControlRemotState.h"
 #include "../ControlHorari/ControlHorariState.h"
 #include "../Rellotge/RellotgeState.h"
+#include "../LogState.h"
 #include "../signals.h"
 #include "../mongoose/mongoose.h"
 #include <atomic>
@@ -13,6 +14,8 @@
 #include "index_html.h"
 #include "../ControlHorari/json_horari.h"
 
+LogState log_state;
+
 // ── Server thread ─────────────────────────────────────────────────────────────
 
 static std::atomic<bool>  s_running{false};
@@ -21,13 +24,29 @@ static QP::QActive*       s_controlRemot = nullptr;
 
 // ── Helpers JSON ──────────────────────────────────────────────────────────────
 
-static std::string outputs_to_json(
+static std::string json_str(const std::string& v) {
+    std::string out;
+    out.reserve(v.size() + 2);
+    out += '"';
+    for (char c : v) {
+        if      (c == '"')  out += "\\\"";
+        else if (c == '\\') out += "\\\\";
+        else if (c == '\n') out += "\\n";
+        else if (c == '\r') out += "\\r";
+        else                out += c;
+    }
+    out += '"';
+    return out;
+}
+
+static std::string build_ws_message(
         const std::unordered_map<int, OutputInfo>& m,
-        int hour, int minute, int wday) {
+        int hour, int minute, int second, int wday,
+        const std::vector<LogEntry>& logs) {
     static const char* DAYS[7] = {
         "dilluns","dimarts","dimecres","dijous","divendres","dissabte","diumenge"};
-    char tbuf[8];
-    std::snprintf(tbuf, sizeof(tbuf), "%02d:%02d", hour, minute);
+    char tbuf[12];
+    std::snprintf(tbuf, sizeof(tbuf), "%02d:%02d:%02d", hour, minute, second);
 
     std::string s = "{\"time\":\"";
     s += tbuf;
@@ -38,26 +57,39 @@ static std::string outputs_to_json(
     for (auto const& [k, v] : m) {
         if (!first) s += ",";
         s += "\"" + std::to_string(k) + "\":{"
-             "\"state\":" + (v.state ? "true" : "false") + ","
+             "\"state\":"     + (v.state     ? "true" : "false") + ","
              "\"commanded\":" + (v.commanded ? "true" : "false") + ","
-             "\"result\":" + (v.result ? "true" : "false") + ","
-             "\"mode\":\"" + (v.remote ? "REMOTE" : "AUTO") + "\""
+             "\"result\":"    + (v.result    ? "true" : "false") + ","
+             "\"mode\":\""    + (v.remote    ? "REMOTE" : "AUTO") + "\""
              "}";
         first = false;
     }
-    s += "}}";
+    s += "},\"log\":[";
+    bool first_log = true;
+    for (auto const& e : logs) {
+        if (!first_log) s += ",";
+        s += "{\"t\":" + json_str(e.time)
+           + ",\"src\":"  + json_str(e.src)
+           + ",\"sig\":"  + json_str(e.sig)
+           + ",\"d\":"    + json_str(e.detail)
+           + "}";
+        first_log = false;
+    }
+    s += "]}";
     return s;
 }
 
 // ── WebSocket push ────────────────────────────────────────────────────────────
 
 static void push_if_pending(struct mg_mgr* mgr) {
-    bool pending = cr_state.push_pending.exchange(false) |
-                   rellotge_state.push_pending.exchange(false);
+    bool pending = cr_state.push_pending.exchange(false)
+                 | rellotge_state.push_pending.exchange(false)
+                 | log_state.push_pending.exchange(false);
     if (!pending) return;
 
     std::unordered_map<int, OutputInfo> outputs;
-    int hh, mm, wd;
+    int hh, mm, ss, wd;
+    std::vector<LogEntry> logs;
     {
         std::lock_guard<std::mutex> lk(cr_state.mtx);
         outputs = cr_state.outputsResult;
@@ -66,10 +98,15 @@ static void push_if_pending(struct mg_mgr* mgr) {
         std::lock_guard<std::mutex> lk(rellotge_state.mtx);
         hh = rellotge_state.hour;
         mm = rellotge_state.minute;
+        ss = rellotge_state.second;
         wd = rellotge_state.wday;
     }
+    {
+        std::lock_guard<std::mutex> lk(log_state.mtx);
+        logs = std::move(log_state.pending);
+    }
 
-    std::string msg = outputs_to_json(outputs, hh, mm, wd);
+    std::string msg = build_ws_message(outputs, hh, mm, ss, wd, logs);
     for (struct mg_connection* c = mgr->conns; c != nullptr; c = c->next) {
         if (c->is_websocket) {
             mg_ws_send(c, msg.c_str(), msg.size(), WEBSOCKET_OP_TEXT);
@@ -98,6 +135,8 @@ static void http_fn(struct mg_connection* c, int ev, void* ev_data) {
             if (s_controlRemot && hm->body.len > 0) {
                 static_cast<ControlRemot*>(s_controlRemot)
                     ->handleJson(hm->body.buf, hm->body.len);
+                log_append("HttpServer", "POST /control",
+                           std::string(hm->body.buf, hm->body.len));
             }
             mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{}");
         }
@@ -125,6 +164,8 @@ static void http_fn(struct mg_connection* c, int ev, void* ev_data) {
                     ch_state.programacioHoraria.assign(hm->body.buf, hm->body.len);
                 }
                 ch_state.load_pending.store(true);
+                log_append("HttpServer", "POST /horari",
+                           std::to_string(hm->body.len) + " bytes");
             }
             mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{}");
         }
@@ -144,7 +185,7 @@ static void http_fn(struct mg_connection* c, int ev, void* ev_data) {
 
     } else if (ev == MG_EV_WS_OPEN) {
         std::unordered_map<int, OutputInfo> outputs;
-        int hh, mm, wd;
+        int hh, mm, ss, wd;
         {
             std::lock_guard<std::mutex> lk(cr_state.mtx);
             outputs = cr_state.outputsResult;
@@ -153,9 +194,10 @@ static void http_fn(struct mg_connection* c, int ev, void* ev_data) {
             std::lock_guard<std::mutex> lk(rellotge_state.mtx);
             hh = rellotge_state.hour;
             mm = rellotge_state.minute;
+            ss = rellotge_state.second;
             wd = rellotge_state.wday;
         }
-        std::string msg = outputs_to_json(outputs, hh, mm, wd);
+        std::string msg = build_ws_message(outputs, hh, mm, ss, wd, {});
         mg_ws_send(c, msg.c_str(), msg.size(), WEBSOCKET_OP_TEXT);
     }
 }

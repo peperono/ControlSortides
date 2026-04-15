@@ -28,6 +28,11 @@ Q_STATE_DEF(Rellotge, initial) {
     m_hour   = lt.tm_hour;
     m_minute = lt.tm_min;
 
+    rellotge_state.hour   = m_hour;
+    rellotge_state.minute = m_minute;
+    rellotge_state.second = 0;
+    rellotge_state.wday   = m_wday;
+
     // 5 ticks = 50 ms @ 100 Hz → cada tick avança 1 minut simulat
     m_tick.armX(5U, 5U);
     return tran(&Rellotge::operating);
@@ -53,11 +58,11 @@ Q_STATE_DEF(Rellotge, operating) {
                     m_wday = (m_wday + 1) % 7;
                 }
             }
-
             {
                 std::lock_guard<std::mutex> lk(rellotge_state.mtx);
                 rellotge_state.hour   = m_hour;
                 rellotge_state.minute = m_minute;
+                rellotge_state.second = 0;
                 rellotge_state.wday   = m_wday;
             }
             rellotge_state.push_pending.store(true);

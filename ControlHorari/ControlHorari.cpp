@@ -1,5 +1,6 @@
 #include "ControlHorari.h"
 #include "ControlHorariState.h"
+#include "../LogState.h"
 #include "../mongoose/mongoose.h"
 #include <cstdio>
 #include <mutex>
@@ -67,10 +68,15 @@ Q_STATE_DEF(ControlHorari, operating) {
                     if (m.hour == hh && m.minute == mm
                         && ev->n_outputs < OutputStateEvt::MAX_OUTPUTS) {
                         ev->outputs[ev->n_outputs++] = { m.id, m.on };
-                        std::printf("[ControlHorari] %02d:%02d output %d -> %s\n",
-                                    hh, mm, m.id, m.on ? "ON" : "OFF");
                     }
                 }
+                std::string detail;
+                for (int i = 0; i < ev->n_outputs; ++i) {
+                    if (i > 0) detail += ", ";
+                    detail += std::to_string(ev->outputs[i].id);
+                    detail += ev->outputs[i].state ? "→ON" : "→OFF";
+                }
+                log_append("ControlHorari", "OUTPUT_STATE_SIG", detail);
                 PUBLISH(ev, this);
             }
             status = Q_HANDLED();

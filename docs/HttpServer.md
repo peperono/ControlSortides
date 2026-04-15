@@ -31,8 +31,9 @@ Accions vàlides:
 | `set_remote` | Posa la sortida en mode REMOTE |
 | `set_auto` | Posa la sortida en mode AUTO |
 | `return_auto` | Retorna a AUTO (`id: -1` → totes) |
+| `delete` | Elimina la sortida del registre |
 
-**Acció interna:** crida `ControlRemot::handleJson()`, que posta `OutputCmdEvt`, `OutputModeEvt` o `OutputReturnAutoEvt` a l'AO.
+**Acció interna:** crida `ControlRemot::handleJson()`, que posta `OutputCmdEvt`, `OutputModeEvt`, `OutputReturnAutoEvt` o `OutputDeleteEvt` a l'AO.
 
 **Resposta:** `{}`
 
@@ -53,21 +54,6 @@ Carrega un nou calendari setmanal.
 **Body:** JSON del calendari (mateix format que el GET).
 
 **Acció interna:** escriu a `ch_state.programacioHoraria` i activa `load_pending` perquè `ControlHorari` el recarregui al proper tick de `Rellotge`.
-
-**Resposta:** `{}`
-
----
-
-### `POST /delete`
-
-Elimina una sortida del registre de `ControlRemot`.
-
-**Body:**
-```json
-{"id": 10}
-```
-
-**Acció interna:** posta `OutputDeleteEvt` (`CTRL_OUTPUT_DELETE_SIG`) a `ControlRemot`.
 
 **Resposta:** `{}`
 

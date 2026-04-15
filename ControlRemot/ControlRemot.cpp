@@ -185,5 +185,11 @@ void ControlRemot::handleJson(const char* buf, std::size_t len) {
             ev->output_id = (int)id;
             POST(ev, this);
         }
+        else if (mg_strcmp(action, mg_str("\"delete\"")) == 0)
+        {
+            auto* ev      = Q_NEW(OutputDeleteEvt, CTRL_OUTPUT_DELETE_SIG);
+            ev->output_id = (int)id;
+            POST(ev, this);
+        }
     }
 }

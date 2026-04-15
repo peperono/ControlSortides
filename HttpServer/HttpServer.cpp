@@ -129,21 +129,6 @@ static void http_fn(struct mg_connection* c, int ev, void* ev_data) {
             mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{}");
         }
 
-        // ── POST /delete ──────────────────────────────────────────────────────
-        else if (mg_match(hm->uri, mg_str("/delete"), NULL)
-                 && mg_match(hm->method, mg_str("POST"), NULL))
-        {
-            if (s_controlRemot && hm->body.len > 0) {
-                long id = mg_json_get_long(hm->body, "$.id", -1);
-                if (id >= 0) {
-                    auto* ev = Q_NEW(OutputDeleteEvt, CTRL_OUTPUT_DELETE_SIG);
-                    ev->output_id = (int)id;
-                    s_controlRemot->POST(ev, nullptr);
-                }
-            }
-            mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{}");
-        }
-
         // ── GET /ws (WebSocket upgrade) ──────────────────────────────────
         else if (mg_match(hm->uri, mg_str("/ws"), NULL)) {
             mg_ws_upgrade(c, hm, NULL);

@@ -20,7 +20,7 @@
 //   Auto + comanda : aplica puntualment i continua en automàtic
 //
 // Format JSON esperat (handleJson):
-//   [{"id":<int>,"action":"<activate|deactivate|set_remote|set_auto|return_auto>"},...]
+//   [{"id":<int>,"action":"<activate|deactivate|set_remote|set_auto|return_auto|delete>"},...]
 class ControlRemot : public QP::QActive {
 public:
     explicit ControlRemot() noexcept;

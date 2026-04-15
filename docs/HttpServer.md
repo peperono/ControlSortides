@@ -42,7 +42,7 @@ Accions vàlides:
 
 Retorna el calendari setmanal actiu.
 
-**Resposta:** JSON del calendari llegit de `ch_state.horariJson` (sota mutex).
+**Resposta:** JSON del calendari llegit de `ch_state.programacioHoraria` (sota mutex).
 
 ---
 
@@ -52,7 +52,7 @@ Carrega un nou calendari setmanal.
 
 **Body:** JSON del calendari (mateix format que el GET).
 
-**Acció interna:** escriu a `ch_state.horariJson` i activa `horariLoadPending` perquè `ControlHorari` el recarregui al proper tick de `Rellotge`.
+**Acció interna:** escriu a `ch_state.programacioHoraria` i activa `load_pending` perquè `ControlHorari` el recarregui al proper tick de `Rellotge`.
 
 **Resposta:** `{}`
 

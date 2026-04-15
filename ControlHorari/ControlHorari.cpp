@@ -46,11 +46,11 @@ Q_STATE_DEF(ControlHorari, operating) {
             int wday = tick->wday;
 
             // Recarrega el calendari si HttpServer n'ha rebut un de nou
-            if (ch_state.horariLoadPending.exchange(false)) {
+            if (ch_state.load_pending.exchange(false)) {
                 std::string copy;
                 {
                     std::lock_guard<std::mutex> lk(ch_state.mtx);
-                    copy = ch_state.horariJson;
+                    copy = ch_state.programacioHoraria;
                 }
                 loadJson(copy.c_str(), copy.size());
             }

@@ -5,8 +5,8 @@
 
 struct ControlHorariState {
     std::mutex        mtx;
-    std::string       horariJson;
-    std::atomic<bool> horariLoadPending{false};
+    std::string       programacioHoraria;
+    std::atomic<bool> load_pending{false};
 };
 
 extern ControlHorariState ch_state;

@@ -109,7 +109,7 @@ static void http_fn(struct mg_connection* c, int ev, void* ev_data) {
             std::string body;
             {
                 std::lock_guard<std::mutex> lk(ch_state.mtx);
-                body = ch_state.horariJson;
+                body = ch_state.programacioHoraria;
             }
             mg_http_reply(c, 200, "Content-Type: application/json\r\n",
                           "%.*s", (int)body.size(), body.c_str());
@@ -122,9 +122,9 @@ static void http_fn(struct mg_connection* c, int ev, void* ev_data) {
             if (hm->body.len > 0) {
                 {
                     std::lock_guard<std::mutex> lk(ch_state.mtx);
-                    ch_state.horariJson.assign(hm->body.buf, hm->body.len);
+                    ch_state.programacioHoraria.assign(hm->body.buf, hm->body.len);
                 }
-                ch_state.horariLoadPending.store(true);
+                ch_state.load_pending.store(true);
             }
             mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{}");
         }

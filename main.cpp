@@ -48,7 +48,7 @@ int main() {
         s_controlRemotQSto, Q_DIM(s_controlRemotQSto),
         nullptr, 0U);
 
-    ch_state.horariJson.assign(JSON_HORARI, sizeof(JSON_HORARI) - 1);
+    ch_state.programacioHoraria.assign(JSON_HORARI, sizeof(JSON_HORARI) - 1);
     s_controlHorari.loadJson(JSON_HORARI, sizeof(JSON_HORARI) - 1);
     s_controlHorari.start(1U,
         s_controlHorariQSto, Q_DIM(s_controlHorariQSto),

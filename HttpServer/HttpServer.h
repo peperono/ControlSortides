@@ -9,9 +9,6 @@
 //                        set_auto|return_auto>"},...]
 //                      Crida controlRemot->handleJson().
 //
-//   POST /io_state   → {"outputs":[{"id":<int>,"state":<bool>},...]}
-//                      Posta OUTPUT_STATE_SIG a controlRemot.
-//
 //   GET  /           → Pàgina HTML de monitorització
 //   WS   /ws         → Push JSON {"outputs":{...}} quan push_pending és true
 

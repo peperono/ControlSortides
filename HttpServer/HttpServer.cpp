@@ -102,39 +102,6 @@ static void http_fn(struct mg_connection* c, int ev, void* ev_data) {
             mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{}");
         }
 
-        // ── POST /io_state ────────────────────────────────────────────────────
-        else if (mg_match(hm->uri, mg_str("/io_state"), NULL)
-                 && mg_match(hm->method, mg_str("POST"), NULL))
-        {
-            if (!s_controlRemot || hm->body.len == 0) {
-                mg_http_reply(c, 400, "", "empty body\n");
-                return;
-            }
-
-            auto* ev = Q_NEW(OutputStateEvt, OUTPUT_STATE_SIG);
-            ev->n_outputs = 0;
-
-            struct mg_str json = hm->body;
-            for (int i = 0; i < OutputStateEvt::MAX_OUTPUTS; ++i) {
-                char path[32];
-                std::snprintf(path, sizeof(path), "$.outputs[%d]", i);
-                int elen = 0;
-                int eoff = mg_json_get(json, path, &elen);
-                if (eoff < 0) break;
-                struct mg_str elem = { json.buf + eoff, (std::size_t)elen };
-
-                long id = mg_json_get_long(elem, "$.id", -1);
-                if (id < 0) continue;
-                bool state = false;
-                mg_json_get_bool(elem, "$.state", &state);
-
-                ev->outputs[ev->n_outputs++] = { (int)id, state };
-            }
-
-            s_controlRemot->POST(ev, nullptr);
-            mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{}");
-        }
-
         // ── GET /horari ───────────────────────────────────────────────────────
         else if (mg_match(hm->uri, mg_str("/horari"), NULL)
                  && mg_match(hm->method, mg_str("GET"), NULL))

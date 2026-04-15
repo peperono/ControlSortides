@@ -167,7 +167,7 @@ function renderOutputs() {
         <div class="output-id">Estat resultant ${id}</div>
         <div class="output-state ${on ? 'on' : 'off'}">${on ? 'ON' : 'OFF'}</div>
         <div class="output-detail">
-          <span class="label">Estat a l'entrada:</span><span class="val ${o.physical?'on':'off'}">${o.physical?'ON':'OFF'}</span>
+          <span class="label">Estat a l'entrada:</span><span class="val ${o.state?'on':'off'}">${o.state?'ON':'OFF'}</span>
           <span class="label">Última comanda:</span><span class="val ${o.commanded?'on':'off'}">${o.commanded?'ON':'OFF'}</span>
           <span class="label">Mode:</span><span class="val ${isRemote?'remote':'auto'}">${o.mode}</span>
         </div>

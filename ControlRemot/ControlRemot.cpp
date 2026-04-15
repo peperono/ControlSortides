@@ -38,7 +38,7 @@ Q_STATE_DEF(ControlRemot, operating) {
             auto const* ev = Q_EVT_CAST(OutputStateEvt);
             for (int i = 0; i < ev->n_outputs; ++i) {
                 auto& out    = m_outputs[ev->outputs[i].id];
-                out.physical = ev->outputs[i].state;
+                out.state = ev->outputs[i].state;
                 if (out.mode == OutputEntry::Mode::AUTO) {
                     out.result = ev->outputs[i].state;
                 }
@@ -69,7 +69,7 @@ Q_STATE_DEF(ControlRemot, operating) {
                                   : OutputEntry::Mode::AUTO;
             out.result = (out.mode == OutputEntry::Mode::REMOTE)
                        ? out.commanded
-                       : out.physical;
+                       : out.state;
             publishResult();
             status = Q_HANDLED();
             break;
@@ -90,12 +90,12 @@ Q_STATE_DEF(ControlRemot, operating) {
             if (ev->output_id == -1) {
                 for (auto& [id, out] : m_outputs) {
                     out.mode   = OutputEntry::Mode::AUTO;
-                    out.result = out.physical;
+                    out.result = out.state;
                 }
             } else {
                 auto& out  = m_outputs[ev->output_id];
                 out.mode   = OutputEntry::Mode::AUTO;
-                out.result = out.physical;
+                out.result = out.state;
             }
             publishResult();
             status = Q_HANDLED();
@@ -124,7 +124,7 @@ void ControlRemot::publishResult() {
         std::lock_guard<std::mutex> lk(cr_state.mtx);
         cr_state.outputsResult.clear();
         for (auto const& [id, out] : m_outputs) {
-            cr_state.outputsResult[id] = {out.physical, out.commanded, out.result,
+            cr_state.outputsResult[id] = {out.state, out.commanded, out.result,
                                         out.mode == OutputEntry::Mode::REMOTE};
         }
     }

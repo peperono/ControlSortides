@@ -38,7 +38,7 @@ static std::string outputs_to_json(
     for (auto const& [k, v] : m) {
         if (!first) s += ",";
         s += "\"" + std::to_string(k) + "\":{"
-             "\"physical\":" + (v.physical ? "true" : "false") + ","
+             "\"state\":" + (v.state ? "true" : "false") + ","
              "\"commanded\":" + (v.commanded ? "true" : "false") + ","
              "\"result\":" + (v.result ? "true" : "false") + ","
              "\"mode\":\"" + (v.remote ? "REMOTE" : "AUTO") + "\""

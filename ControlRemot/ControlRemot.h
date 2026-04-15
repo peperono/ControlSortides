@@ -31,7 +31,7 @@ public:
 private:
     struct OutputEntry {
         enum class Mode : uint8_t { AUTO, REMOTE } mode = Mode::AUTO;
-        bool physical  = false; // últim estat físic conegut
+        bool state  = false; // últim estat físic conegut
         bool commanded = false; // últim valor ordenat
         bool result    = false; // valor resultant publicat
     };

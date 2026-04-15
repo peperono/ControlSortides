@@ -4,7 +4,7 @@
 #include <unordered_map>
 
 struct OutputInfo {
-    bool physical  = false;
+    bool state  = false;
     bool commanded = false;
     bool result    = false;
     bool remote    = false; // true = REMOTE, false = AUTO

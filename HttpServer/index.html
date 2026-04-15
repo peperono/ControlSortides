@@ -164,7 +164,7 @@ function renderOutputs() {
     const isRemote = o.mode === 'REMOTE';
     return `
       <div class="output-card ${on ? 'active' : ''}">
-        <div class="output-id">Estat resultant ${id}</div>
+        <div class="output-id">Sortida ${id}</div>
         <div class="output-state ${on ? 'on' : 'off'}">${on ? 'ON' : 'OFF'}</div>
         <div class="output-detail">
           <span class="label">Estat a l'entrada:</span><span class="val ${o.state?'on':'off'}">${o.state?'ON':'OFF'}</span>

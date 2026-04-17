@@ -46,7 +46,7 @@ h1{text-align:center;margin-bottom:24px;color:#00d4ff}
 .io-form select{background:#0f3460;border:1px solid #444;color:#e0e0e0;border-radius:4px;padding:6px 10px;font-size:14px}
 .btn-send{padding:10px 24px;font-size:14px;display:block;margin:12px auto 0}
 
-.log{background:#0a0a1a;border-radius:8px;padding:12px;max-height:200px;overflow-y:auto;font-family:monospace;font-size:13px;line-height:1.6}
+.log{background:#0a0a1a;border-radius:8px;padding:12px;max-height:200px;overflow-y:auto;font-family:monospace;font-size:13px;line-height:1.6;white-space:nowrap;overflow-x:auto}
 .log-entry{border-bottom:1px solid #1a1a2e;padding:2px 0}
 .log-entry .time{color:#666}
 .log-entry .change{color:#4caf50}
@@ -58,9 +58,14 @@ h1{text-align:center;margin-bottom:24px;color:#00d4ff}
 <div class="status" id="ws-status"><span class="dot off"></span>Desconnectat</div>
 
 <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start;max-width:1400px;margin:0 auto 20px">
+  <div class="section" style="flex:0 0 auto;margin:0;min-width:180px;text-align:center">
+    <h2>Rellotge</h2>
+    <div id="rellotge-time" style="font-size:36px;color:#00d4ff;font-weight:bold;font-family:monospace;letter-spacing:2px">--:--:--</div>
+    <div id="rellotge-day" style="font-size:14px;color:#888;margin-top:6px;text-transform:capitalize">---</div>
+  </div>
+
   <div class="section" style="flex:1 1 400px;margin:0">
     <h2>ControlHorari</h2>
-    <div id="horari-time" style="text-align:center;font-size:32px;color:#00d4ff;font-weight:bold;font-family:monospace;margin-bottom:12px">-- --:--</div>
     <textarea id="horari-json" spellcheck="false" style="width:100%;height:280px;background:#0a0a1a;color:#e0e0e0;border:1px solid #0f3460;border-radius:8px;padding:10px;font-family:monospace;font-size:12px;resize:vertical"></textarea>
     <div style="display:flex;gap:8px;justify-content:center;margin-top:10px">
       <button class="btn btn-send" onclick="loadHorari()" style="margin:0">Carregar</button>
@@ -74,7 +79,7 @@ h1{text-align:center;margin-bottom:24px;color:#00d4ff}
   </div>
 </div>
 
-<div class="section">
+<div class="section" style="max-width:1400px">
   <h2>Log</h2>
   <div class="log" id="log"></div>
 </div>
@@ -106,21 +111,23 @@ function connect() {
   ws.onmessage = (e) => {
     try {
       const data = JSON.parse(e.data);
-      const prev = Object.fromEntries(
-        Object.entries(currentState).map(([k,v]) => [k, {...v}]));
       currentState = data.outputs || {};
       if (data.time) {
-        document.getElementById('horari-time').textContent =
-          (data.day || '') + ' ' + data.time;
+        document.getElementById('rellotge-time').textContent = data.time;
+        document.getElementById('rellotge-day').textContent  = data.day || '';
       }
       const key = JSON.stringify(currentState);
       if (key !== lastRenderKey) {
         lastRenderKey = key;
         renderOutputs();
       }
-      logChanges(prev, currentState);
+      if (data.log && data.log.length > 0) {
+        for (const entry of data.log) {
+          addLog(entry.t, entry.src, entry.sig, entry.d);
+        }
+      }
     } catch(err) {
-      addLog('Client', 'WS parse', 'ERROR: ' + err.message + ' | data: ' + e.data.substring(0,200));
+      addLog('--:--:--', 'WS', 'parse error', err.message + ' | ' + e.data.substring(0, 200));
     }
   };
 }
@@ -134,20 +141,18 @@ function loadHorari() {
     } catch {
       document.getElementById('horari-json').value = txt;
     }
-    addLog('Client', 'GET /horari', 'horari carregat');
-  }).catch(err => addLog('Client', 'GET /horari', 'ERROR: ' + err.message));
+  });
 }
 
 function applyHorari() {
   const body = document.getElementById('horari-json').value;
   try { JSON.parse(body); }
-  catch (e) { addLog('Client', '-', 'ERROR JSON invàlid: ' + e.message); return; }
+  catch (e) { alert('JSON invàlid: ' + e.message); return; }
   fetch('/horari', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body
-  }).then(() => addLog('Client', 'POST /horari → SharedState → ControlHorari', 'horari aplicat'))
-    .catch(err => addLog('Client', 'POST /horari', 'ERROR: ' + err.message));
+  });
 }
 
 loadHorari();
@@ -165,10 +170,10 @@ function renderOutputs() {
     const isRemote = o.mode === 'REMOTE';
     return `
       <div class="output-card ${on ? 'active' : ''}">
-        <div class="output-id">Estat resultant ${id}</div>
+        <div class="output-id">Sortida ${id}</div>
         <div class="output-state ${on ? 'on' : 'off'}">${on ? 'ON' : 'OFF'}</div>
         <div class="output-detail">
-          <span class="label">Estat a l'entrada:</span><span class="val ${o.physical?'on':'off'}">${o.physical?'ON':'OFF'}</span>
+          <span class="label">Estat a l'entrada:</span><span class="val ${o.state?'on':'off'}">${o.state?'ON':'OFF'}</span>
           <span class="label">Última comanda:</span><span class="val ${o.commanded?'on':'off'}">${o.commanded?'ON':'OFF'}</span>
           <span class="label">Mode:</span><span class="val ${isRemote?'remote':'auto'}">${o.mode}</span>
         </div>
@@ -190,34 +195,24 @@ function ctrlAction(id, action) {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify([{id, action}])
-  }).then(() => addLog('Client', 'POST /control → ControlRemot queue', `${id} -> ${action}`));
+  });
 }
 
 function deleteOutput(id) {
-  fetch('/delete', {
+  fetch('/control', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({id})
-  }).then(() => addLog('Client', 'POST /delete → ControlRemot queue', `eliminar ${id}`));
+    body: JSON.stringify([{id, action: 'delete'}])
+  });
 }
 
 // ── Log ────────────────────────────────────────────────────────────
-function addLog(origin, dest, msg) {
-  const t = new Date().toLocaleTimeString();
-  const color = origin === 'ControlRemot' ? '#00d4ff' : '#ff9800';
-  const tag = `<span style="color:${color};font-weight:600">[${origin}]</span>`;
-  const destTag = dest && dest !== '-' ? `<span style="color:#888"> → ${dest}</span>` : '';
-  logEl.innerHTML = `<div class="log-entry"><span class="time">${t}</span> ${tag}${destTag} ${msg}</div>` + logEl.innerHTML;
-}
-
-function logChanges(prev, curr) {
-  for (const id of Object.keys(curr)) {
-    const p = prev[id], c = curr[id];
-    if (!p || p.result !== c.result || p.mode !== c.mode) {
-      const from = !p ? '---' : (p.result ? 'ON' : 'OFF');
-      addLog('ControlRemot', 'WS → Client', `<span class="change">output ${id}: ${from} -> ${c.result ? 'ON' : 'OFF'} [${c.mode}]</span>`);
-    }
-  }
+function addLog(t, src, sig, detail) {
+  const colors = {ControlRemot: '#00d4ff', ControlHorari: '#4caf50', HttpServer: '#ff9800', WS: '#f44'};
+  const color = colors[src] || '#aaa';
+  const srcTag  = `<span style="color:${color};font-weight:600">[${src}]</span>`;
+  const sigTag  = `<span style="color:#888">${sig}</span>`;
+  logEl.innerHTML = `<div class="log-entry"><span class="time">${t}</span> ${srcTag} ${sigTag} ${detail}</div>` + logEl.innerHTML;
 }
 
 </script>
